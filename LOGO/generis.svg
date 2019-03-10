@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="3090.4431"
+   height="3010.3831"
+   viewBox="0 0 3090.4432 3010.383"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="generis.svg"
+   inkscape:export-filename="/home/eric/data/WORK/PROJECT/TOOL/GENERIS/LOGO/generis.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
+  <defs
+     id="defs4">
+    <marker
+       inkscape:stockid="Arrow1Lstart"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Lstart"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path4170"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         transform="matrix(0.8,0,0,0.8,10,0)"
+         inkscape:connector-curvature="0" />
+    </marker>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.0875"
+     inkscape:cx="934.62835"
+     inkscape:cy="-280.90237"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     units="px"
+     inkscape:window-width="1920"
+     inkscape:window-height="1056"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     fit-margin-top="120"
+     fit-margin-left="120"
+     fit-margin-right="120"
+     fit-margin-bottom="120">
+    <inkscape:grid
+       type="xygrid"
+       id="grid4149"
+       originx="-29.694007"
+       originy="172.24354" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-29.694006,1785.7775)">
+    <g
+       id="g4193"
+       transform="translate(26.258304,0)">
+      <circle
+         r="1000"
+         cy="-655.77753"
+         cx="1548.6572"
+         id="path4158"
+         style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#2b59d8;stroke-width:20;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <circle
+         r="657.0755"
+         cy="-655.77747"
+         cx="1548.6572"
+         id="path4160"
+         style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#2b59d8;stroke-width:20;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path4164"
+         d="m 2053.4819,-1160.6026 -504.8247,504.82509 798.5732,0 -82.6718,-325.40993 z"
+         style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         sodipodi:nodetypes="ccccc"
+         inkscape:connector-curvature="0"
+         id="rect4162"
+         d="m 1548.6572,-655.90377 667.4437,0.12627 -0.7376,19.87373 -666.7061,-0.0484 z"
+         style="opacity:1;fill:#2b59d8;fill-opacity:1;stroke:none;stroke-width:35;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <g
+       id="g4205"
+       transform="matrix(0.99988482,0,0,1.0366981,0.18140472,-16.673807)">
+      <text
+         sodipodi:linespacing="100%"
+         id="text4177"
+         y="1068.0558"
+         x="136.79506"
+         style="font-style:normal;font-weight:normal;font-size:50.05473328px;line-height:100%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#2b59d8;fill-opacity:1;stroke:#ffffff;stroke-width:18;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           id="tspan4199"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:782.10522461px;line-height:100%;font-family:Giorgio;-inkscape-font-specification:Giorgio;letter-spacing:0px;fill:#2b59d8;fill-opacity:1;stroke:none;stroke-width:18;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           y="1068.0558"
+           x="136.79506"
+           sodipodi:role="line">Generis</tspan></text>
+      <rect
+         y="747.38892"
+         x="460.24249"
+         height="54.285713"
+         width="220.89632"
+         id="rect4203"
+         style="opacity:1;fill:#2b59d8;fill-opacity:1;stroke:none;stroke-width:20;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+  </g>
+</svg>
