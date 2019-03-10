@@ -19,6 +19,63 @@ import ( "html"
 // ~~
 
 
+// -- TYPES
+
+type StringStack struct {
+    ElementArray []string;
+}
+
+// ~~
+
+func ( stack * StringStack ) IsEmpty( ) bool {
+    return len( stack.ElementArray ) == 0;
+}
+
+// ~~
+
+func ( stack * StringStack ) Push( element string ) {
+    stack.ElementArray = append( stack.ElementArray, element );
+}
+
+// ~~
+
+func ( stack * StringStack ) Pop( ) string {
+    var element string;
+
+    element = stack.ElementArray[ len( stack.ElementArray ) - 1 ];
+
+    stack.ElementArray = stack.ElementArray[ : len( stack.ElementArray ) - 1 ];
+
+    return element;
+}
+type Int32Stack struct {
+    ElementArray []int32;
+}
+
+// ~~
+
+func ( stack * Int32Stack ) IsEmpty( ) bool {
+    return len( stack.ElementArray ) == 0;
+}
+
+// ~~
+
+func ( stack * Int32Stack ) Push( element int32 ) {
+    stack.ElementArray = append( stack.ElementArray, element );
+}
+
+// ~~
+
+func ( stack * Int32Stack ) Pop( ) int32 {
+    var element int32;
+
+    element = stack.ElementArray[ len( stack.ElementArray ) - 1 ];
+
+    stack.ElementArray = stack.ElementArray[ : len( stack.ElementArray ) - 1 ];
+
+    return element;
+}
+
 // -- FUNCTIONS
 
 func HandleRootPage( response_writer http.ResponseWriter, request * http.Request ) {
@@ -77,61 +134,4 @@ func main() {
     log.Println( "Listening on http://localhost:8080" );
 
     log.Fatal( http.ListenAndServe( ":8080", nil ) );
-}
-
-// -- STATEMENTS
-
-type StringStack struct {
-    ElementArray []string;
-}
-
-// ~~
-
-func ( stack * StringStack ) IsEmpty( ) bool {
-    return len( stack.ElementArray ) == 0;
-}
-
-// ~~
-
-func ( stack * StringStack ) Push( element string ) {
-    stack.ElementArray = append( stack.ElementArray, element );
-}
-
-// ~~
-
-func ( stack * StringStack ) Pop( ) string {
-    var element string;
-
-    element = stack.ElementArray[ len( stack.ElementArray ) - 1 ];
-
-    stack.ElementArray = stack.ElementArray[ : len( stack.ElementArray ) - 1 ];
-
-    return element;
-}
-type Int32Stack struct {
-    ElementArray []int32;
-}
-
-// ~~
-
-func ( stack * Int32Stack ) IsEmpty( ) bool {
-    return len( stack.ElementArray ) == 0;
-}
-
-// ~~
-
-func ( stack * Int32Stack ) Push( element int32 ) {
-    stack.ElementArray = append( stack.ElementArray, element );
-}
-
-// ~~
-
-func ( stack * Int32Stack ) Pop( ) int32 {
-    var element int32;
-
-    element = stack.ElementArray[ len( stack.ElementArray ) - 1 ];
-
-    stack.ElementArray = stack.ElementArray[ : len( stack.ElementArray ) - 1 ];
-
-    return element;
 }

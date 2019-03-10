@@ -72,6 +72,11 @@ import (
     }
 #end
 
+// -- TYPES
+
+DeclareStack( String, string )
+DeclareStack( Int32, int32 )
+
 // -- FUNCTIONS
 
 func HandleRootPage(
@@ -148,8 +153,3 @@ func main()
         http.ListenAndServe( ":8080", nil )
         );
 }
-
-// -- STATEMENTS
-
-DeclareStack( String, string )
-DeclareStack( Int32, int32 )
