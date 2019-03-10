@@ -164,33 +164,65 @@ DeclareStack( String, string )
 DeclareStack( Int32, int32 )
 ```
 
+### Commands
+
+```cpp
+#define generic code
+#as generic code
+
+#define generic code
+#as
+    generic
+    code
+#end
+
+#define
+    generic
+    code
+#as generic code
+
+#define
+    generic
+    code
+#as
+    generic
+    code
+#end
+
+#if boolean expression
+    #if boolean expression
+        ...
+    #else
+        ...
+    #end
+#else
+    #if boolean expression
+        ...
+    #else
+        ...
+    #end
+#end
+
+#write writer expression
+    <% code %>
+    <%@ natural expression %>
+    <%# integer expression %>
+    <%& real expression %>
+    <%= text expression %>
+    <%~ escaped text expression %>
+    <\% ignored %\>
+#end
+```
+
 ### Boolean expression
 
 ```
-true
 false
-!...
-... && ...
-... || ...
-( ... )
-```
-
-### Generic code
-
-```
-{{parameter_name}}
-```
-
-### Template code
-
-```
-<% code %>
-<%@ natural_expression %>
-<%# integer_expression %>
-<%& real_expression %>
-<%= text_expression %>
-<%~ escaped_text_expression %>
-<\% ignored tags %\>
+true
+!expression
+expression && expression
+expression || expression
+( expression )
 ```
 
 ## Installation
