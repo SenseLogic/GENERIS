@@ -1583,7 +1583,7 @@ bool IsOpeningCharacter(
 
 // ~~
 
-bool IsOpeningCharacter(
+bool IsClosingCharacter(
     char character
     )
 {
