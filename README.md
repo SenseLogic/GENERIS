@@ -167,25 +167,25 @@ func main()
 ### Commands
 
 ```cpp
-#define generic code
-#as generic code
+#define old code
+#as new code
 
-#define generic code
+#define old code
 #as
-    generic
+    new
     code
 #end
 
 #define
-    generic
+    old
     code
-#as generic code
+#as new code
 
 #define
-    generic
+    old
     code
 #as
-    generic
+    new
     code
 #end
 
@@ -212,6 +212,48 @@ func main()
     <%~ escaped text expression %>
     <\% ignored %\>
 #end
+```
+
+
+### Old code variable
+
+```cpp
+{{variable name}} : code
+{{variable name$}} : text
+{{variable name#}} : expression
+{{variable name:condition}}
+```
+
+### Condition
+
+```cpp
+HasPrefix prefix
+HasSuffix suffix
+HasText text
+HasIdentifier text
+```
+
+### New code variable
+
+{{variable name:filter:filter:...}}
+
+### Filter
+
+```cpp
+PascalCase
+SnakeCase
+MinorCase
+MajorCase
+UpperCase
+LowerCase
+ReplacePrefix old_prefix new_prefix
+ReplaceSuffix old_suffix new_suffix
+ReplaceText old_text new_text
+ReplaceIdentifier old_identifier new_identifier
+RemovePrefix prefix
+RemoveSuffix suffix
+RemoveText text
+RemoveIdentifier identifier
 ```
 
 ### Boolean expression

@@ -27,7 +27,7 @@ import (
 
 // ~~
 
-#define local {{variable}} : {{type}};
+#define local {{variable#}} : {{type#}};
 #as var {{variable}} {{type}};
 
 // ~~

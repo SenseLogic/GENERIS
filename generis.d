@@ -33,7 +33,7 @@ import std.string : endsWith, indexOf, join, replace, split, startsWith, strip, 
 
 enum TOKEN_CONTEXT
 {
-    None,
+    Code,
     ShortComment,
     LongComment,
     StringLiteral
@@ -43,7 +43,7 @@ enum TOKEN_CONTEXT
 
 enum TOKEN_TYPE
 {
-    None,
+    Character,
     Blank,
     Identifier,
     Parameter
@@ -61,13 +61,27 @@ class TOKEN
         Context;
     TOKEN_TYPE
         Type;
+    long
+        Level;
 
     // -- CONSTRUCTORS
 
     this(
+        TOKEN token
+        )
+    {
+        Text = token.Text;
+        Context = token.Context;
+        Type = token.Type;
+        Level = token.Level;
+    }
+
+    // ~~
+
+    this(
         string text = "",
-        TOKEN_CONTEXT token_context = TOKEN_CONTEXT.None,
-        TOKEN_TYPE token_type = TOKEN_TYPE.None
+        TOKEN_CONTEXT token_context = TOKEN_CONTEXT.Code,
+        TOKEN_TYPE token_type = TOKEN_TYPE.Character
         )
     {
         Text = text;
@@ -79,8 +93,8 @@ class TOKEN
 
     this(
         char character,
-        TOKEN_CONTEXT token_context = TOKEN_CONTEXT.None,
-        TOKEN_TYPE token_type = TOKEN_TYPE.None
+        TOKEN_CONTEXT token_context = TOKEN_CONTEXT.Code,
+        TOKEN_TYPE token_type = TOKEN_TYPE.Character
         )
     {
         Text ~= character;
@@ -89,6 +103,46 @@ class TOKEN
     }
 
     // -- INQUIRIES
+
+    bool IsCode(
+        )
+    {
+        return Context == TOKEN_CONTEXT.Code;
+    }
+
+    // ~~
+
+    bool IsShortComment(
+        )
+    {
+        return Context == TOKEN_CONTEXT.ShortComment;
+    }
+
+    // ~~
+
+    bool IsLongComment(
+        )
+    {
+        return Context == TOKEN_CONTEXT.LongComment;
+    }
+
+    // ~~
+
+    bool IsStringLiteral(
+        )
+    {
+        return Context == TOKEN_CONTEXT.StringLiteral;
+    }
+
+    // ~~
+
+    bool IsCharacter(
+        )
+    {
+        return Type == TOKEN_TYPE.Character;
+    }
+
+    // ~~
 
     bool IsBlank(
         )
@@ -126,14 +180,6 @@ class TOKEN
         {
             return token.Text == Text;
         }
-    }
-
-    // ~~
-
-    string GetParameterName(
-        )
-    {
-        return Text[ 2 .. $ - 2 ].split( ":" )[ 0 ];
     }
 
     // ~~
@@ -179,15 +225,7 @@ class CODE
     string GetText(
         )
     {
-        string
-            text;
-
-        foreach ( token; TokenArray )
-        {
-            text ~= token.Text;
-        }
-
-        return text;
+        return TokenArray.GetText();
     }
 
     // ~~
@@ -195,10 +233,7 @@ class CODE
     void Dump(
         )
     {
-        foreach( token_index, token; TokenArray )
-        {
-            token.Dump( token_index );
-        }
+        TokenArray.Dump();
     }
 
     // -- OPERATIONS
@@ -532,6 +567,203 @@ class DEFINITION
 
     // -- INQUIRIES
 
+    void ParseParameter(
+        ref string parameter_name,
+        ref TOKEN[] parameter_token_array,
+        string parameter_text
+        )
+    {
+        string
+            parameter_token_text;
+        CODE
+            parameter_code;
+
+        parameter_code = new CODE( parameter_text[ 2 .. $ - 2 ], false );
+        parameter_token_array = parameter_code.TokenArray.GetPackedTokenArray();
+
+        if ( parameter_token_array.length == 0
+             || !parameter_token_array[ 0 ].IsIdentifier() )
+        {
+            Abort( "Invalid parameter : " ~ parameter_text );
+        }
+
+        parameter_name = parameter_token_array[ 0 ].Text;
+        parameter_token_array = parameter_token_array[ 1 .. $ ];
+    }
+
+    // ~~
+
+    bool MatchesParameter(
+        TOKEN[] parameter_token_array,
+        TOKEN[] token_array
+        )
+    {
+        bool
+            boolean;
+        long
+            parameter_token_index;
+        string
+            argument_text;
+        TOKEN
+            parameter_token;
+        TOKEN[]
+            expression_token_array;
+
+        for ( parameter_token_index = 0;
+              parameter_token_index < parameter_token_array.length;
+              ++parameter_token_index )
+        {
+            parameter_token = parameter_token_array[ parameter_token_index ];
+
+            if ( parameter_token.IsIdentifier() )
+            {
+                boolean = false;
+
+                if ( ( parameter_token.Text == "HasPrefix"
+                       || parameter_token.Text == "HasSuffix"
+                       || parameter_token.Text == "HasText"
+                       || parameter_token.Text == "HasIdentifier" )
+                     && parameter_token_index + 1 < parameter_token_array.length
+                     && parameter_token_array[ parameter_token_index + 1 ].IsStringLiteral() )
+                {
+                    ++parameter_token_index;
+
+                    argument_text = parameter_token_array[ parameter_token_index ].Text;
+
+                    if ( parameter_token.Text == "HasPrefix" )
+                    {
+                        boolean = token_array.HasPrefix( argument_text );
+                    }
+                    else if ( parameter_token.Text == "HasSuffix" )
+                    {
+                        boolean = token_array.HasSuffix( argument_text );
+                    }
+                    else if ( parameter_token.Text == "HasText" )
+                    {
+                        boolean = token_array.HasText( argument_text );
+                    }
+                    else if ( parameter_token.Text == "HasIdentifier" )
+                    {
+                        boolean = token_array.HasIdentifier( argument_text );
+                    }
+                }
+                else
+                {
+                    Abort( "Invalid function : " ~ parameter_token_array[ parameter_token_index .. $ ].GetText() );
+                }
+
+                expression_token_array
+                    ~= new TOKEN(
+                           boolean ? "true" : "false",
+                           TOKEN_CONTEXT.Code,
+                           TOKEN_TYPE.Identifier
+                           );
+            }
+            else if ( !parameter_token.IsBlank() )
+            {
+                expression_token_array ~= parameter_token;
+            }
+        }
+
+        return EvaluateBooleanExpression( expression_token_array.GetText() );
+    }
+
+    // ~~
+
+    bool MatchesParameter(
+        TOKEN[] parameter_token_array,
+        ref TOKEN[] matched_token_array,
+        TOKEN[] token_array
+        )
+    {
+        CODE
+            parameter_code;
+
+        if ( parameter_token_array.length >= 1
+             && parameter_token_array[ 0 ].IsCharacter()
+             && parameter_token_array[ 0 ].Text == "$" )
+        {
+            parameter_token_array = parameter_token_array[ 1 .. $ ];
+        }
+        else
+        {
+            if ( GetLevel( token_array ) != 0 )
+            {
+                return false;
+            }
+
+            if ( parameter_token_array.length >= 1
+                 && parameter_token_array[ 0 ].IsCharacter()
+                 && parameter_token_array[ 0 ].Text == "#" )
+            {
+                parameter_token_array = parameter_token_array[ 1 .. $ ];
+
+                if ( token_array.EndsStatement() )
+                {
+                    return false;
+                }
+            }
+        }
+
+        if ( parameter_token_array.length >= 2
+             && parameter_token_array[ 0 ].IsCharacter()
+             && parameter_token_array[ 0 ].Text == ":" )
+        {
+            if ( !MatchesParameter( parameter_token_array[ 1 .. $ ], token_array ) )
+            {
+                return false;
+            }
+
+            parameter_token_array = null;
+        }
+
+        if ( parameter_token_array.length > 0 )
+        {
+            Abort( "Invalid parameter : " ~ parameter_token_array.to!string() );
+        }
+
+        matched_token_array = token_array;
+
+        return true;
+    }
+
+    // ~~
+
+    TOKEN[] GetNewTokenArray(
+        TOKEN[] parameter_token_array,
+        TOKEN[] token_array
+        )
+    {
+        long
+            token_index;
+        CODE
+            parameter_code;
+        TOKEN[]
+            new_token_array;
+
+        for ( token_index = 0;
+              token_index < token_array.length;
+              ++token_index )
+        {
+            new_token_array ~= new TOKEN( token_array[ token_index ] );
+        }
+
+        while ( parameter_token_array.length >= 2
+                && parameter_token_array[ 0 ].IsCharacter()
+                && parameter_token_array[ 0 ].Text == ":" )
+        {
+        }
+
+        if ( parameter_token_array.length > 0 )
+        {
+            Abort( "Invalid parameter : " ~ parameter_token_array.to!string() );
+        }
+
+        return new_token_array;
+    }
+
+    // ~~
+
     MATCH GetMatch(
         TOKEN[] token_array,
         long token_index
@@ -555,7 +787,8 @@ class DEFINITION
             old_token,
             token;
         TOKEN[]
-            matched_token_array;
+            matched_token_array,
+            parameter_token_array;
 
         match = new MATCH();
 
@@ -569,8 +802,9 @@ class DEFINITION
 
             if ( old_token.IsParameter() )
             {
-                next_old_token_index = old_token_index + 1;
+                ParseParameter( parameter_name, parameter_token_array, old_token.Text );
 
+                next_old_token_index = old_token_index + 1;
                 matched_token_count = 0;
 
                 while ( next_old_token_index + matched_token_count < OldTokenArray.length
@@ -603,7 +837,8 @@ class DEFINITION
                         }
                     }
 
-                    if ( matched_token_index == matched_token_count )
+                    if ( matched_token_index == matched_token_count
+                         && MatchesParameter( parameter_token_array, matched_token_array, token_array[ token_index .. next_token_index ] ) )
                     {
                         break;
                     }
@@ -615,16 +850,12 @@ class DEFINITION
 
                 if ( matched_token_index == matched_token_count )
                 {
-                    parameter_name = old_token.GetParameterName();
-
                     if ( match.HasParameter( parameter_name ) )
                     {
                         writeln( OldCode.GetText() );
 
                         Abort( "Duplicate parameter : {{" ~ parameter_name ~ "}}" );
                     }
-
-                    matched_token_array = token_array[ token_index .. next_token_index ];
 
                     match.OldTokenArray ~= matched_token_array;
                     match.ParameterCodeMap[ parameter_name ] = new CODE( matched_token_array );
@@ -656,7 +887,7 @@ class DEFINITION
             {
                 if ( new_token.IsParameter() )
                 {
-                    parameter_name = new_token.GetParameterName();
+                    ParseParameter( parameter_name, parameter_token_array, new_token.Text );
 
                     if ( !match.HasParameter( parameter_name ) )
                     {
@@ -668,7 +899,7 @@ class DEFINITION
 
                     parameter_code = match.ParameterCodeMap[ parameter_name ];
 
-                    match.NewTokenArray ~= parameter_code.TokenArray;
+                    match.NewTokenArray ~= GetNewTokenArray( parameter_token_array, parameter_code.TokenArray );
                 }
                 else
                 {
@@ -1571,30 +1802,6 @@ bool IsIdentifierCharacter(
 
 // ~~
 
-bool IsOpeningCharacter(
-    char character
-    )
-{
-    return
-        character == '{'
-        || character == '['
-        || character == '(';
-}
-
-// ~~
-
-bool IsClosingCharacter(
-    char character
-    )
-{
-    return
-        character == '}'
-        || character == ']'
-        || character == ')';
-}
-
-// ~~
-
 long GetSpaceCount(
     string text
     )
@@ -1750,19 +1957,219 @@ bool IsOpeningCommand(
 
 // ~~
 
+TOKEN[] GetPackedTokenArray(
+    TOKEN[] token_array
+    )
+{
+    long
+        token_index;
+    string
+        token_text;
+    TOKEN
+        token;
+    TOKEN[]
+        packed_token_array;
+
+    for ( token_index = 0;
+          token_index < token_array.length;
+          ++token_index )
+    {
+        token = token_array[ token_index ];
+
+        if ( !token.IsShortComment()
+             && !token.IsLongComment() )
+        {
+            if ( token.IsStringLiteral() )
+            {
+                token_text = "";
+                ++token_index;
+
+                while ( token_index < token_array.length )
+                {
+                    token = token_array[ token_index ];
+
+                    if ( token.IsStringLiteral() )
+                    {
+                        if ( token.Text == "\"" )
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            token_text ~= token.Text;
+                        }
+                    }
+                    else
+                    {
+                        Abort( "Invalid string literal : " ~ token_array.GetText() );
+
+                        break;
+                    }
+                }
+
+                token.Text = token_text;
+            }
+
+            packed_token_array ~= token;
+        }
+    }
+
+    return packed_token_array;
+}
+
+// ~~
+
+string GetText(
+    TOKEN[] token_array
+    )
+{
+    string
+        text;
+
+    foreach ( token; token_array )
+    {
+        text ~= token.Text;
+    }
+
+    return text;
+}
+
+// ~~
+
+bool HasPrefix(
+    TOKEN[] token_array,
+    string prefix
+    )
+{
+    return token_array.GetText().startsWith( prefix );
+}
+
+// ~~
+
+bool HasSuffix(
+    TOKEN[] token_array,
+    string suffix
+    )
+{
+    return token_array.GetText().startsWith( suffix );
+}
+
+// ~~
+
+bool HasText(
+    TOKEN[] token_array,
+    string text
+    )
+{
+    return token_array.GetText().indexOf( text ) >= 0;
+}
+
+// ~~
+
+bool HasIdentifier(
+    TOKEN[] token_array,
+    string identifier
+    )
+{
+    foreach ( token; token_array )
+    {
+        if ( token.IsIdentifier()
+             && token.Text == identifier )
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+// ~~
+
+long GetLevel(
+    TOKEN[] token_array
+    )
+{
+    long
+        level;
+
+    foreach ( token; token_array )
+    {
+        token.Level = level;
+
+        if ( token.IsCharacter() )
+        {
+            if ( token.Text == "{"
+                 || token.Text == "["
+                 || token.Text == "(" )
+            {
+                ++level;
+            }
+            else if ( token.Text == "}"
+                 || token.Text == "]"
+                 || token.Text == ")" )
+            {
+                --level;
+            }
+        }
+    }
+
+    return level;
+}
+
+// ~~
+
+bool EndsStatement(
+    TOKEN[] token_array
+    )
+{
+    long
+        level;
+
+    foreach ( token; token_array )
+    {
+        if ( token.IsCharacter()
+             && token.IsCode()
+             && token.Text == ";"
+             && token.Level == 0 )
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+// ~~
+
+void Dump(
+    TOKEN[] token_array
+    )
+{
+    foreach( token_index, token; token_array )
+    {
+        token.Dump( token_index );
+    }
+}
+
+// ~~
+
 bool EvaluateBooleanExpression(
     string boolean_expression
     )
 {
     string
-        old_boolean_expression;
+        old_value,
+        value;
+
+    value = boolean_expression;
 
     do
     {
-        old_boolean_expression = boolean_expression;
+        old_value = value;
 
-        boolean_expression
-            = boolean_expression
+        value
+            = value
                   .replace( " ", "" )
                   .replace( "!false", "true" )
                   .replace( "!true", "false" )
@@ -1777,13 +2184,13 @@ bool EvaluateBooleanExpression(
                   .replace( "(true)", "true")
                   .replace( "(false)", "false" );
     }
-    while ( boolean_expression != old_boolean_expression );
+    while ( value != old_value );
 
-    if ( boolean_expression == "false" )
+    if ( value == "false" )
     {
         return false;
     }
-    else if ( boolean_expression == "true" )
+    else if ( value == "true" )
     {
         return true;
     }
