@@ -27,6 +27,14 @@ import ( "html"
 
 // ~~
 
+
+
+// -- TYPES
+
+type Int32Stack struct {
+    ElementArray []int32;
+}
+
 // -- FUNCTIONS
 
 func HandleRootPage( response_writer http.ResponseWriter, request * http.Request ) {

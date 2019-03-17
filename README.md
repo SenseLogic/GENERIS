@@ -41,7 +41,7 @@ import (
 
 // ~~
 
-#define DeclareStack( {{name}}, {{type}} )
+#define DeclareStack( {{type}}, {{name}} )
 #as
     // -- TYPES
 
@@ -83,10 +83,17 @@ import (
     }
 #end
 
+// ~~
+
+#define DeclareStack( {{type}} )
+#as
+    DeclareStack( {{type}}, {{type:PascalCase}} )
+#end
+
 // -- TYPES
 
-DeclareStack( String, string )
-DeclareStack( Int32, int32 )
+DeclareStack( string )
+DeclareStack( int32 )
 
 // -- FUNCTIONS
 
@@ -222,12 +229,12 @@ func main()
 {{variable name}} : hierarchical code
 {{variable name#}} : statement code (without semicolon)
 {{variable name$}} : code
-{{variable name:condition}} : conditional hierarchical code
-{{variable name#:condition}} : conditional statement code
-{{variable name$:condition}} : conditional code
+{{variable name:boolean expression}} : conditional hierarchical code
+{{variable name#:boolean expression}} : conditional statement code
+{{variable name$:boolean expression}} : conditional code
 ```
 
-### Old code condition
+### Old code boolean function
 
 ```cpp
 HasText text
@@ -236,17 +243,15 @@ HasSuffix suffix
 HasIdentifier text
 ```
 
-Sample :
-
-```cpp
-{{collection:HasSuffix "Array" || HasSuffix "Map"}}
-```
-
 ### New code parameter
 
-{{variable name:filter:filter:...}}
+```cpp
+{{variable name}}
+{{variable name:filter function}}
+{{variable name:filter function:filter function:...}}
+```
 
-### New code filter
+### New code filter function
 
 ```cpp
 LowerCase
@@ -268,6 +273,18 @@ RemoveText text
 RemovePrefix prefix
 RemoveSuffix suffix
 RemoveIdentifier identifier
+```
+
+### Boolean expression
+
+```
+false
+true
+function call
+!expression
+expression && expression
+expression || expression
+( expression )
 ```
 
 ## Installation
@@ -308,7 +325,7 @@ Processes the Generis files of the input folder to generate Go files in the outp
 
 ## Version
 
-1.0
+0.9
 
 ## Author
 

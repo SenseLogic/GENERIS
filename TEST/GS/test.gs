@@ -68,6 +68,26 @@ import (
 #define var {{variable#}} : {{type#}};
 #as var {{variable}} {{type}};
 
+#define class {{name}} { {{definition}} }
+#as
+    type {{name}} struct
+    {
+        {{definition}}
+    }
+#end
+
+#define DeclareStack( {{type}} )
+#as
+    class {{type:PascalCase}}Stack
+    {
+        ElementArray []{{type}};
+    }
+#end
+
+// -- TYPES
+
+DeclareStack( int32 )
+
 // -- FUNCTIONS
 
 func HandleRootPage(

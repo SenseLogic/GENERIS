@@ -32,7 +32,7 @@ import (
 
 // ~~
 
-#define DeclareStack( {{name}}, {{type}} )
+#define DeclareStack( {{type}}, {{name}} )
 #as
     // -- TYPES
 
@@ -74,10 +74,17 @@ import (
     }
 #end
 
+// ~~
+
+#define DeclareStack( {{type}} )
+#as
+    DeclareStack( {{type}}, {{type:PascalCase}} )
+#end
+
 // -- TYPES
 
-DeclareStack( String, string )
-DeclareStack( Int32, int32 )
+DeclareStack( string )
+DeclareStack( int32 )
 
 // -- FUNCTIONS
 

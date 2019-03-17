@@ -46,6 +46,8 @@ enum TOKEN_TYPE
     Character,
     Blank,
     Identifier,
+    Literal,
+    Value,
     Parameter
 }
 
@@ -166,6 +168,22 @@ class TOKEN
         )
     {
         return Type == TOKEN_TYPE.Identifier;
+    }
+
+    // ~~
+
+    bool IsLiteral(
+        )
+    {
+        return Type == TOKEN_TYPE.Literal;
+    }
+
+    // ~~
+
+    bool IsValue(
+        )
+    {
+        return Type == TOKEN_TYPE.Value;
     }
 
     // ~~
@@ -606,6 +624,7 @@ class DEFINITION
 
         PackStrings( parameter_token_array );
         EvaluateStrings( parameter_token_array );
+        RemoveBlanks( parameter_token_array );
 
         if ( parameter_token_array.length == 0
              || !parameter_token_array[ 0 ].IsIdentifier() )
@@ -645,9 +664,9 @@ class DEFINITION
             {
                 boolean = false;
 
-                if ( ( parameter_token.Text == "HasPrefix"
+                if ( ( parameter_token.Text == "HasText"
+                       || parameter_token.Text == "HasPrefix"
                        || parameter_token.Text == "HasSuffix"
-                       || parameter_token.Text == "HasText"
                        || parameter_token.Text == "HasIdentifier" )
                      && parameter_token_index + 1 < parameter_token_array.length
                      && parameter_token_array[ parameter_token_index + 1 ].IsString() )
@@ -656,17 +675,17 @@ class DEFINITION
 
                     argument_text = parameter_token_array[ parameter_token_index ].Text;
 
-                    if ( parameter_token.Text == "HasPrefix" )
+                    if ( parameter_token.Text == "HasText" )
+                    {
+                        boolean = token_array.HasText( argument_text );
+                    }
+                    else if ( parameter_token.Text == "HasPrefix" )
                     {
                         boolean = token_array.HasPrefix( argument_text );
                     }
                     else if ( parameter_token.Text == "HasSuffix" )
                     {
                         boolean = token_array.HasSuffix( argument_text );
-                    }
-                    else if ( parameter_token.Text == "HasText" )
-                    {
-                        boolean = token_array.HasText( argument_text );
                     }
                     else if ( parameter_token.Text == "HasIdentifier" )
                     {
@@ -745,7 +764,7 @@ class DEFINITION
 
         if ( parameter_token_array.length > 0 )
         {
-            Abort( "Invalid parameter : " ~ parameter_token_array.to!string() );
+            Abort( "Invalid parameter : " ~ parameter_token_array.GetText( " " ) );
         }
 
         matched_token_array = token_array;
@@ -761,7 +780,10 @@ class DEFINITION
         )
     {
         long
+            argument_count,
             token_index;
+        string
+            function_name;
         CODE
             parameter_code;
         TOKEN[]
@@ -776,13 +798,174 @@ class DEFINITION
 
         while ( parameter_token_array.length >= 2
                 && parameter_token_array[ 0 ].IsCharacter()
-                && parameter_token_array[ 0 ].Text == ":" )
+                && parameter_token_array[ 0 ].Text == ":"
+                && parameter_token_array[ 1 ].IsIdentifier() )
         {
+            function_name = parameter_token_array[ 1 ].Text;
+
+            parameter_token_array = parameter_token_array[ 2 .. $ ];
+
+            argument_count = 0;
+
+            while ( argument_count < parameter_token_array.length )
+            {
+                if ( parameter_token_array[ argument_count ].IsCharacter()
+                     && parameter_token_array[ argument_count ].Text == ":" )
+                {
+                    break;
+                }
+
+                ++argument_count;
+            }
+
+            if ( function_name == "LowerCase"
+                 && argument_count == 0 )
+            {
+                new_token_array.ConvertToLowerCase();
+            }
+            else if ( function_name == "UpperCase"
+                      && argument_count == 0 )
+            {
+                new_token_array.ConvertToUpperCase();
+            }
+            else if ( function_name == "MinorCase"
+                      && argument_count == 0 )
+            {
+                new_token_array.ConvertToMinorCase();
+            }
+            else if ( function_name == "MajorCase"
+                      && argument_count == 0 )
+            {
+                new_token_array.ConvertToMajorCase();
+            }
+            else if ( function_name == "SnakeCase"
+                      && argument_count == 0 )
+            {
+                new_token_array.ConvertToSnakeCase();
+            }
+            else if ( function_name == "PascalCase"
+                      && argument_count == 0 )
+            {
+                new_token_array.ConvertToPascalCase();
+            }
+            else if ( function_name == "CamelCase"
+                      && argument_count == 0 )
+            {
+                new_token_array.ConvertToCamelCase();
+            }
+            else if ( function_name == "RemoveComments"
+                      && argument_count == 0 )
+            {
+                new_token_array.RemoveComments();
+            }
+            else if ( function_name == "RemoveBlanks"
+                      && argument_count == 0 )
+            {
+                new_token_array.RemoveBlanks();
+            }
+            else if ( function_name == "PackStrings"
+                      && argument_count == 0 )
+            {
+                new_token_array.PackStrings();
+            }
+            else if ( function_name == "PackIdentifiers"
+                      && argument_count == 0 )
+            {
+                new_token_array.PackIdentifiers();
+            }
+            else if ( function_name == "ReplaceText"
+                      && argument_count == 0 )
+            {
+                new_token_array.RemoveComments();
+            }
+            else if ( function_name == "RemoveComments"
+                      && argument_count == 0 )
+            {
+                new_token_array.RemoveComments();
+            }
+            else if ( function_name == "ReplaceText"
+                      && argument_count == 2
+                      && parameter_token_array[ 0 ].IsString()
+                      && parameter_token_array[ 1 ].IsString() )
+            {
+                new_token_array.ReplaceText(
+                    parameter_token_array[ 0 ].Text,
+                    parameter_token_array[ 1 ].Text
+                    );
+            }
+            else if ( function_name == "ReplacePrefix"
+                      && argument_count == 2
+                      && parameter_token_array[ 0 ].IsString()
+                      && parameter_token_array[ 1 ].IsString() )
+            {
+                new_token_array.ReplacePrefix(
+                    parameter_token_array[ 0 ].Text,
+                    parameter_token_array[ 1 ].Text
+                    );
+            }
+            else if ( function_name == "ReplaceSuffix"
+                      && argument_count == 2
+                      && parameter_token_array[ 0 ].IsString()
+                      && parameter_token_array[ 1 ].IsString() )
+            {
+                new_token_array.ReplaceSuffix(
+                    parameter_token_array[ 0 ].Text,
+                    parameter_token_array[ 1 ].Text
+                    );
+            }
+            else if ( function_name == "ReplaceIdentifier"
+                      && argument_count == 2
+                      && parameter_token_array[ 0 ].IsString()
+                      && parameter_token_array[ 1 ].IsString() )
+            {
+                new_token_array.ReplaceIdentifier(
+                    parameter_token_array[ 0 ].Text,
+                    parameter_token_array[ 1 ].Text
+                    );
+            }
+            else if ( function_name == "RemoveText"
+                      && argument_count == 1
+                      && parameter_token_array[ 0 ].IsString() )
+            {
+                new_token_array.RemoveText(
+                    parameter_token_array[ 0 ].Text
+                    );
+            }
+            else if ( function_name == "RemovePrefix"
+                      && argument_count == 1
+                      && parameter_token_array[ 0 ].IsString() )
+            {
+                new_token_array.RemovePrefix(
+                    parameter_token_array[ 0 ].Text
+                    );
+            }
+            else if ( function_name == "RemoveSuffix"
+                      && argument_count == 1
+                      && parameter_token_array[ 0 ].IsString() )
+            {
+                new_token_array.RemoveSuffix(
+                    parameter_token_array[ 0 ].Text
+                    );
+            }
+            else if ( function_name == "RemoveIdentifier"
+                      && argument_count == 1
+                      && parameter_token_array[ 0 ].IsString() )
+            {
+                new_token_array.RemoveIdentifier(
+                    parameter_token_array[ 0 ].Text
+                    );
+            }
+            else
+            {
+                Abort( "Invalid function call : " ~ function_name ~ parameter_token_array[ 0 .. argument_count ].GetText( " " ) );
+            }
+
+            parameter_token_array = parameter_token_array[ argument_count .. $ ];
         }
 
         if ( parameter_token_array.length > 0 )
         {
-            Abort( "Invalid parameter : " ~ parameter_token_array.to!string() );
+            Abort( "Invalid parameter : " ~ parameter_token_array.GetText( " " ) );
         }
 
         return new_token_array;
@@ -1168,6 +1351,13 @@ class FILE
                             if ( stripped_line == "#end" )
                             {
                                 --level;
+
+                                if ( level < 0 )
+                                {
+                                    Dump( LineArray[ 0 .. line_index + 1 ] );
+
+                                    AbortFile( "Invalid #end" );
+                                }
                             }
                         }
 
@@ -1274,6 +1464,13 @@ class FILE
                         if ( stripped_line == "#end" )
                         {
                             --level;
+
+                            if ( level < 0 )
+                            {
+                                Dump( LineArray[ 0 .. end_line_index + 1 ] );
+
+                                AbortFile( "Invalid #end" );
+                            }
                         }
                     }
 
@@ -2105,18 +2302,35 @@ bool IsOpeningCommand(
 // ~~
 
 string GetText(
-    TOKEN[] token_array
+    TOKEN[] token_array,
+    string delimiter_text = ""
     )
 {
     string
         text;
 
-    foreach ( token; token_array )
+    foreach ( token_index, token; token_array )
     {
+        if ( token_index > 0
+             && delimiter_text.length > 0 )
+        {
+            text ~= delimiter_text;
+        }
+
         text ~= token.Text;
     }
 
     return text;
+}
+
+// ~~
+
+bool HasText(
+    TOKEN[] token_array,
+    string text
+    )
+{
+    return token_array.GetText().indexOf( text ) >= 0;
 }
 
 // ~~
@@ -2137,16 +2351,6 @@ bool HasSuffix(
     )
 {
     return token_array.GetText().startsWith( suffix );
-}
-
-// ~~
-
-bool HasText(
-    TOKEN[] token_array,
-    string text
-    )
-{
-    return token_array.GetText().indexOf( text ) >= 0;
 }
 
 // ~~
@@ -2253,6 +2457,8 @@ void PackStrings(
             while ( token_index + 1 < token_array.length
                     && token_array[ token_index + 1 ].IsString() )
             {
+                token.Type = TOKEN_TYPE.Literal;
+
                 ++token_index;
 
                 token.Text ~= token_array[ token_index ].Text;
@@ -2286,6 +2492,7 @@ void EvaluateStrings(
         if ( token.IsString() )
         {
             token.Text = token.Text[ 1 .. $ - 1 ];
+            token.Type = TOKEN_TYPE.Value;
         }
     }
 }
@@ -2575,7 +2782,10 @@ long GetLevel(
                  || token.Text == "["
                  || token.Text == "(" )
             {
-                ++level;
+                if ( level >= 0 )
+                {
+                    ++level;
+                }
             }
             else if ( token.Text == "}"
                  || token.Text == "]"
