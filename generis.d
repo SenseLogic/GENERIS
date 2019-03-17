@@ -27,7 +27,7 @@ import std.datetime : Clock, SysTime;
 import std.file : dirEntries, exists, mkdirRecurse, readText, timeLastModified, write, FileException, SpanMode;
 import std.path : dirName;
 import std.stdio : writeln;
-import std.string : endsWith, indexOf, join, replace, split, startsWith, strip, stripLeft, stripRight, toUpper;
+import std.string : endsWith, indexOf, join, replace, split, startsWith, strip, stripLeft, stripRight, toLower, toUpper;
 
 // -- TYPES
 
@@ -579,7 +579,9 @@ class DEFINITION
             parameter_code;
 
         parameter_code = new CODE( parameter_text[ 2 .. $ - 2 ], false );
-        parameter_token_array = parameter_code.TokenArray.GetPackedTokenArray();
+        parameter_token_array = parameter_code.TokenArray;
+
+        ProcessStrings( parameter_token_array );
 
         if ( parameter_token_array.length == 0
              || !parameter_token_array[ 0 ].IsIdentifier() )
@@ -1802,6 +1804,127 @@ bool IsIdentifierCharacter(
 
 // ~~
 
+string GetMinorCaseText(
+    string text
+    )
+{
+    return text[ 0 .. 1 ].toLower() ~ text[ 1 .. $ ];
+}
+
+// ~~
+
+string GetMajorCaseText(
+    string text
+    )
+{
+    return text[ 0 .. 1 ].toUpper() ~ text[ 1 .. $ ];
+}
+
+// ~~
+
+string GetSnakeCaseText(
+    string text
+    )
+{
+    char
+        character,
+        prior_character;
+    string
+        snake_case_text;
+
+    snake_case_text = "";
+    character = 0;
+
+    foreach ( character_index; 0 .. text.length )
+    {
+        prior_character = character;
+        character = text[ character_index ];
+
+        if ( ( ( prior_character >= 'a' && prior_character <= 'z' )
+               && ( ( character >= 'A' && character <= 'Z' )
+                    || ( character >= '0' && character <= '9' ) ) )
+             || ( ( prior_character >= '0' && prior_character <= '9' )
+                  && ( ( character >= 'a' && character <= 'z' )
+                       || ( character >= 'A' && character <= 'Z' ) ) ) )
+        {
+            snake_case_text ~= '_';
+        }
+
+        snake_case_text ~= character;
+    }
+
+    return snake_case_text.toLower();
+}
+
+// ~~
+
+string GetPascalCaseText(
+    string text
+    )
+{
+    string[]
+        word_array;
+
+    word_array = text.toLower().split( '_' );
+
+    foreach ( ref word; word_array )
+    {
+        word = word.GetMajorCaseText();
+    }
+
+    return word_array.join( "" );
+}
+
+// ~~
+
+string GetCamelCaseText(
+    string text
+    )
+{
+    return text.GetPascalCaseText().GetMinorCaseText();
+}
+
+// ~~
+
+void ReplacePrefix(
+    ref string text,
+    string old_prefix,
+    string new_prefix
+    )
+{
+    if ( text.startsWith( old_prefix ) )
+    {
+        text = new_prefix ~ text[ old_prefix.length .. $ ];
+    }
+}
+
+// ~~
+
+void ReplaceSuffix(
+    ref string text,
+    string old_suffix,
+    string new_suffix
+    )
+{
+    if ( text.endsWith( old_suffix ) )
+    {
+        text = text[ 0 .. $ - old_suffix.length ] ~ new_suffix;
+    }
+}
+
+// ~~
+
+void ReplaceText(
+    ref string text,
+    string old_text,
+    string new_text
+    )
+{
+    text = text.replace( old_text, new_text );
+}
+
+// ~~
+
 long GetSpaceCount(
     string text
     )
@@ -1957,68 +2080,6 @@ bool IsOpeningCommand(
 
 // ~~
 
-TOKEN[] GetPackedTokenArray(
-    TOKEN[] token_array
-    )
-{
-    long
-        token_index;
-    string
-        token_text;
-    TOKEN
-        token;
-    TOKEN[]
-        packed_token_array;
-
-    for ( token_index = 0;
-          token_index < token_array.length;
-          ++token_index )
-    {
-        token = token_array[ token_index ];
-
-        if ( !token.IsShortComment()
-             && !token.IsLongComment() )
-        {
-            if ( token.IsStringLiteral() )
-            {
-                token_text = "";
-                ++token_index;
-
-                while ( token_index < token_array.length )
-                {
-                    token = token_array[ token_index ];
-
-                    if ( token.IsStringLiteral() )
-                    {
-                        if ( token.Text == "\"" )
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            token_text ~= token.Text;
-                        }
-                    }
-                    else
-                    {
-                        Abort( "Invalid string literal : " ~ token_array.GetText() );
-
-                        break;
-                    }
-                }
-
-                token.Text = token_text;
-            }
-
-            packed_token_array ~= token;
-        }
-    }
-
-    return packed_token_array;
-}
-
-// ~~
-
 string GetText(
     TOKEN[] token_array
     )
@@ -2081,6 +2142,360 @@ bool HasIdentifier(
     }
 
     return false;
+}
+
+// ~~
+
+void ProcessStrings(
+    ref TOKEN[] token_array
+    )
+{
+    long
+        token_index;
+    string
+        token_text;
+    TOKEN
+        token;
+    TOKEN[]
+        new_token_array;
+
+    for ( token_index = 0;
+          token_index < token_array.length;
+          ++token_index )
+    {
+        token = token_array[ token_index ];
+
+        if ( token.IsStringLiteral() )
+        {
+            token_text = "";
+            ++token_index;
+
+            while ( token_index < token_array.length )
+            {
+                token = token_array[ token_index ];
+
+                if ( token.IsStringLiteral() )
+                {
+                    if ( token.Text == "\"" )
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        token_text ~= token.Text;
+                    }
+                }
+                else
+                {
+                    Abort( "Invalid string literal : " ~ token_array.GetText() );
+
+                    break;
+                }
+            }
+
+            token.Text = token_text;
+        }
+
+        new_token_array ~= token;
+    }
+
+    token_array = new_token_array;
+}
+
+// ~~
+
+void MergeIdentifiers(
+    ref TOKEN[] token_array
+    )
+{
+    long
+        token_index;
+    TOKEN
+        token;
+    TOKEN[]
+        new_token_array;
+
+    for ( token_index = 0;
+          token_index < token_array.length;
+          ++token_index )
+    {
+        token = token_array[ token_index ];
+
+        if ( token.IsIdentifier() )
+        {
+            while ( token_index + 1 < token_array.length
+                    && token_array[ token_index + 1 ].IsIdentifier() )
+            {
+                ++token_index;
+
+                token.Text ~= token_array[ token_index ].Text;
+            }
+        }
+
+        new_token_array ~= token;
+    }
+
+    token_array = new_token_array;
+}
+
+// ~~
+
+void ConvertToLowerCase(
+    ref TOKEN[] token_array
+    )
+{
+    MergeIdentifiers( token_array );
+
+    foreach ( token; token_array )
+    {
+        if ( token.IsIdentifier() )
+        {
+            token.Text = token.Text.toLower();
+        }
+    }
+}
+
+// ~~
+
+void ConvertToUpperCase(
+    ref TOKEN[] token_array
+    )
+{
+    MergeIdentifiers( token_array );
+
+    foreach ( token; token_array )
+    {
+        if ( token.IsIdentifier() )
+        {
+            token.Text = token.Text.toUpper();
+        }
+    }
+}
+
+// ~~
+
+void ConvertToMinorCase(
+    ref TOKEN[] token_array
+    )
+{
+    MergeIdentifiers( token_array );
+
+    foreach ( token; token_array )
+    {
+        if ( token.IsIdentifier() )
+        {
+            token.Text = token.Text.GetMinorCaseText();
+        }
+    }
+}
+
+// ~~
+
+void ConvertToMajorCase(
+    ref TOKEN[] token_array
+    )
+{
+    MergeIdentifiers( token_array );
+
+    foreach ( token; token_array )
+    {
+        if ( token.IsIdentifier() )
+        {
+            token.Text = token.Text.GetMajorCaseText();
+        }
+    }
+}
+
+// ~~
+
+void ConvertToSnakeCase(
+    ref TOKEN[] token_array
+    )
+{
+    MergeIdentifiers( token_array );
+
+    foreach ( token; token_array )
+    {
+        if ( token.IsIdentifier() )
+        {
+            token.Text = token.Text.GetSnakeCaseText();
+        }
+    }
+}
+
+// ~~
+
+void ConvertToPascalCase(
+    ref TOKEN[] token_array
+    )
+{
+    MergeIdentifiers( token_array );
+
+    foreach ( token; token_array )
+    {
+        if ( token.IsIdentifier() )
+        {
+            token.Text = token.Text.GetPascalCaseText();
+        }
+    }
+}
+
+// ~~
+
+void ConvertToCamelCase(
+    ref TOKEN[] token_array
+    )
+{
+    MergeIdentifiers( token_array );
+
+    foreach ( token; token_array )
+    {
+        if ( token.IsIdentifier() )
+        {
+            token.Text = token.Text.GetCamelCaseText();
+        }
+    }
+}
+
+// ~~
+
+void ReplacePrefix(
+    ref TOKEN[] token_array,
+    string old_prefix,
+    string new_prefix
+    )
+{
+    MergeIdentifiers( token_array );
+
+    if ( token_array.length > 0
+         && token_array[ 0 ].IsIdentifier() )
+    {
+        ReplacePrefix( token_array[ 0 ].Text, old_prefix, new_prefix );
+    }
+}
+
+// ~~
+
+void ReplaceSuffix(
+    ref TOKEN[] token_array,
+    string old_suffix,
+    string new_suffix
+    )
+{
+    MergeIdentifiers( token_array );
+
+    if ( token_array.length > 0
+         && token_array[ 0 ].IsIdentifier() )
+    {
+        ReplaceSuffix( token_array[ 0 ].Text, old_suffix, new_suffix );
+    }
+}
+
+// ~~
+
+void ReplaceText(
+    ref TOKEN[] token_array,
+    string old_text,
+    string new_text
+    )
+{
+    MergeIdentifiers( token_array );
+
+    foreach ( token; token_array )
+    {
+        ReplaceText( token.Text, old_text, new_text );
+    }
+}
+
+// ~~
+
+void ReplaceIdentifier(
+    ref TOKEN[] token_array,
+    string old_identifier,
+    string new_identifier
+    )
+{
+    MergeIdentifiers( token_array );
+
+    foreach ( token; token_array )
+    {
+        if ( token.IsIdentifier()
+             && token.Text == old_identifier )
+        {
+            token.Text = new_identifier;
+        }
+    }
+}
+
+// ~~
+
+void RemovePrefix(
+    ref TOKEN[] token_array,
+    string prefix
+    )
+{
+    MergeIdentifiers( token_array );
+
+    if ( token_array.length > 0
+         && token_array[ 0 ].IsIdentifier() )
+    {
+        ReplacePrefix( token_array[ 0 ].Text, prefix, "" );
+    }
+}
+
+// ~~
+
+void RemoveSuffix(
+    ref TOKEN[] token_array,
+    string suffix
+    )
+{
+    MergeIdentifiers( token_array );
+
+    if ( token_array.length > 0
+         && token_array[ 0 ].IsIdentifier() )
+    {
+        ReplaceSuffix( token_array[ 0 ].Text, suffix, "" );
+    }
+}
+
+// ~~
+
+void RemoveText(
+    ref TOKEN[] token_array,
+    string text
+    )
+{
+    MergeIdentifiers( token_array );
+
+    foreach ( token; token_array )
+    {
+        ReplaceText( token.Text, text, "" );
+    }
+}
+
+// ~~
+
+void RemoveIdentifier(
+    ref TOKEN[] token_array,
+    string identifier
+    )
+{
+    TOKEN[]
+        new_token_array;
+
+    MergeIdentifiers( token_array );
+
+    foreach ( token; token_array )
+    {
+        if ( !token.IsIdentifier()
+             || token.Text != identifier )
+        {
+            new_token_array ~= token;
+        }
+    }
+
+    token_array = new_token_array;
 }
 
 // ~~

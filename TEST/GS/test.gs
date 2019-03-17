@@ -63,6 +63,11 @@ import (
     "DDD{{xxx}}DDD"
 #end
 
+// ~~
+
+#define var {{variable#}} : {{type#}};
+#as var {{variable}} {{type}};
+
 // -- FUNCTIONS
 
 func HandleRootPage(

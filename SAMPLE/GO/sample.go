@@ -21,17 +21,19 @@ import ( "html"
 
 // -- TYPES
 
+// -- TYPES
+
 type StringStack struct {
     ElementArray []string;
 }
 
-// ~~
+// -- INQUIRIES
 
 func ( stack * StringStack ) IsEmpty( ) bool {
     return len( stack.ElementArray ) == 0;
 }
 
-// ~~
+// -- OPERATIONS
 
 func ( stack * StringStack ) Push( element string ) {
     stack.ElementArray = append( stack.ElementArray, element );
@@ -48,17 +50,19 @@ func ( stack * StringStack ) Pop( ) string {
 
     return element;
 }
+// -- TYPES
+
 type Int32Stack struct {
     ElementArray []int32;
 }
 
-// ~~
+// -- INQUIRIES
 
 func ( stack * Int32Stack ) IsEmpty( ) bool {
     return len( stack.ElementArray ) == 0;
 }
 
-// ~~
+// -- OPERATIONS
 
 func ( stack * Int32Stack ) Push( element int32 ) {
     stack.ElementArray = append( stack.ElementArray, element );

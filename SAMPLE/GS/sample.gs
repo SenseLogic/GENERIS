@@ -27,19 +27,21 @@ import (
 
 // ~~
 
-#define local {{variable#}} : {{type#}};
+#define local {{variable}} : {{type}};
 #as var {{variable}} {{type}};
 
 // ~~
 
 #define DeclareStack( {{name}}, {{type}} )
 #as
+    // -- TYPES
+
     type {{name}}Stack struct
     {
         ElementArray []{{type}};
     }
 
-    // ~~
+    // -- INQUIRIES
 
     func ( stack * {{name}}Stack ) IsEmpty(
         ) bool
@@ -47,7 +49,7 @@ import (
         return len( stack.ElementArray ) == 0;
     }
 
-    // ~~
+    // -- OPERATIONS
 
     func ( stack * {{name}}Stack ) Push(
         element {{type}}

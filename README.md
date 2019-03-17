@@ -36,19 +36,21 @@ import (
 
 // ~~
 
-#define local {{variable#}} : {{type#}};
+#define local {{variable}} : {{type}};
 #as var {{variable}} {{type}};
 
 // ~~
 
 #define DeclareStack( {{name}}, {{type}} )
 #as
+    // -- TYPES
+
     type {{name}}Stack struct
     {
         ElementArray []{{type}};
     }
 
-    // ~~
+    // -- INQUIRIES
 
     func ( stack * {{name}}Stack ) IsEmpty(
         ) bool
@@ -56,7 +58,7 @@ import (
         return len( stack.ElementArray ) == 0;
     }
 
-    // ~~
+    // -- OPERATIONS
 
     func ( stack * {{name}}Stack ) Push(
         element {{type}}
@@ -218,9 +220,9 @@ func main()
 ### Old code variable
 
 ```cpp
-{{variable name}} : code
-{{variable name$}} : text
-{{variable name#}} : expression
+{{variable name}} : code block
+{{variable name#}} : expression block
+{{variable name$}} : text block
 {{variable name:condition}}
 ```
 
@@ -240,12 +242,13 @@ HasIdentifier text
 ### Filter
 
 ```cpp
-PascalCase
-SnakeCase
+LowerCase
+UpperCase
 MinorCase
 MajorCase
-UpperCase
-LowerCase
+SnakeCase
+PascalCase
+CamelCase
 ReplacePrefix old_prefix new_prefix
 ReplaceSuffix old_suffix new_suffix
 ReplaceText old_text new_text
