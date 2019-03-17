@@ -36,7 +36,7 @@ enum TOKEN_CONTEXT
     Code,
     ShortComment,
     LongComment,
-    StringLiteral
+    String
 }
 
 // ~~
@@ -128,10 +128,20 @@ class TOKEN
 
     // ~~
 
-    bool IsStringLiteral(
+    bool IsComment(
         )
     {
-        return Context == TOKEN_CONTEXT.StringLiteral;
+        return
+            Context == TOKEN_CONTEXT.ShortComment
+            || Context == TOKEN_CONTEXT.LongComment;
+    }
+
+    // ~~
+
+    bool IsString(
+        )
+    {
+        return Context == TOKEN_CONTEXT.String;
     }
 
     // ~~
@@ -164,6 +174,19 @@ class TOKEN
         )
     {
         return Type == TOKEN_TYPE.Parameter;
+    }
+
+    // ~~
+
+    bool IsStringDelimiter(
+        )
+    {
+        return
+            Context == TOKEN_CONTEXT.String
+            && Type == TOKEN_TYPE.Character
+            && ( Text == "'"
+                 || Text == "\""
+                 || Text == "`" );
     }
 
     // ~~
@@ -397,7 +420,7 @@ class CODE
                     token.Text ~= character;
                 }
             }
-            else if ( token.Context == TOKEN_CONTEXT.StringLiteral )
+            else if ( token.Context == TOKEN_CONTEXT.String )
             {
                 if ( character == delimiter_character )
                 {
@@ -413,10 +436,10 @@ class CODE
                 {
                     AddTokenArray( token, parameters_are_parsed );
 
-                    token = new TOKEN( text[ character_index .. character_index + 2 ], TOKEN_CONTEXT.StringLiteral );
+                    token = new TOKEN( text[ character_index .. character_index + 2 ], TOKEN_CONTEXT.String );
                     AddToken( token );
 
-                    token = new TOKEN( "", TOKEN_CONTEXT.StringLiteral );
+                    token = new TOKEN( "", TOKEN_CONTEXT.String );
 
                     ++character_index;
                 }
@@ -458,10 +481,10 @@ class CODE
 
                 delimiter_character = character;
 
-                token = new TOKEN( delimiter_character, TOKEN_CONTEXT.StringLiteral );
+                token = new TOKEN( delimiter_character, TOKEN_CONTEXT.String );
                 AddToken( token );
 
-                token = new TOKEN( "", TOKEN_CONTEXT.StringLiteral );
+                token = new TOKEN( "", TOKEN_CONTEXT.String );
             }
             else
             {
@@ -581,7 +604,8 @@ class DEFINITION
         parameter_code = new CODE( parameter_text[ 2 .. $ - 2 ], false );
         parameter_token_array = parameter_code.TokenArray;
 
-        ProcessStrings( parameter_token_array );
+        PackStrings( parameter_token_array );
+        EvaluateStrings( parameter_token_array );
 
         if ( parameter_token_array.length == 0
              || !parameter_token_array[ 0 ].IsIdentifier() )
@@ -626,7 +650,7 @@ class DEFINITION
                        || parameter_token.Text == "HasText"
                        || parameter_token.Text == "HasIdentifier" )
                      && parameter_token_index + 1 < parameter_token_array.length
-                     && parameter_token_array[ parameter_token_index + 1 ].IsStringLiteral() )
+                     && parameter_token_array[ parameter_token_index + 1 ].IsString() )
                 {
                     ++parameter_token_index;
 
@@ -2146,14 +2170,12 @@ bool HasIdentifier(
 
 // ~~
 
-void ProcessStrings(
+void RemoveComments(
     ref TOKEN[] token_array
     )
 {
     long
         token_index;
-    string
-        token_text;
     TOKEN
         token;
     TOKEN[]
@@ -2165,35 +2187,81 @@ void ProcessStrings(
     {
         token = token_array[ token_index ];
 
-        if ( token.IsStringLiteral() )
+        if ( !token.IsComment() )
         {
-            token_text = "";
-            ++token_index;
+            new_token_array ~= token;
+        }
+    }
 
-            while ( token_index < token_array.length )
+    token_array = new_token_array;
+}
+
+// ~~
+
+void RemoveBlanks(
+    ref TOKEN[] token_array
+    )
+{
+    long
+        token_index;
+    TOKEN
+        token;
+    TOKEN[]
+        new_token_array;
+
+    for ( token_index = 0;
+          token_index < token_array.length;
+          ++token_index )
+    {
+        token = token_array[ token_index ];
+
+        if ( !token.IsBlank()
+             || !token.IsCode() )
+        {
+            new_token_array ~= token;
+        }
+    }
+
+    token_array = new_token_array;
+}
+
+// ~~
+
+void PackStrings(
+    ref TOKEN[] token_array
+    )
+{
+    long
+        token_index;
+    string
+        delimiter_text;
+    TOKEN
+        token;
+    TOKEN[]
+        new_token_array;
+
+    for ( token_index = 0;
+          token_index < token_array.length;
+          ++token_index )
+    {
+        token = token_array[ token_index ];
+
+        if ( token.IsStringDelimiter() )
+        {
+            delimiter_text = token.Text;
+
+            while ( token_index + 1 < token_array.length
+                    && token_array[ token_index + 1 ].IsString() )
             {
-                token = token_array[ token_index ];
+                ++token_index;
 
-                if ( token.IsStringLiteral() )
-                {
-                    if ( token.Text == "\"" )
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        token_text ~= token.Text;
-                    }
-                }
-                else
-                {
-                    Abort( "Invalid string literal : " ~ token_array.GetText() );
+                token.Text ~= token_array[ token_index ].Text;
 
+                if ( token_array[ token_index ].Text == delimiter_text )
+                {
                     break;
                 }
             }
-
-            token.Text = token_text;
         }
 
         new_token_array ~= token;
@@ -2204,7 +2272,27 @@ void ProcessStrings(
 
 // ~~
 
-void MergeIdentifiers(
+void EvaluateStrings(
+    ref TOKEN[] token_array
+    )
+{
+    long
+        token_index;
+    string
+        delimiter_text;
+
+    foreach ( token; token_array )
+    {
+        if ( token.IsString() )
+        {
+            token.Text = token.Text[ 1 .. $ - 1 ];
+        }
+    }
+}
+
+// ~~
+
+void PackIdentifiers(
     ref TOKEN[] token_array
     )
 {
@@ -2244,8 +2332,6 @@ void ConvertToLowerCase(
     ref TOKEN[] token_array
     )
 {
-    MergeIdentifiers( token_array );
-
     foreach ( token; token_array )
     {
         if ( token.IsIdentifier() )
@@ -2261,8 +2347,6 @@ void ConvertToUpperCase(
     ref TOKEN[] token_array
     )
 {
-    MergeIdentifiers( token_array );
-
     foreach ( token; token_array )
     {
         if ( token.IsIdentifier() )
@@ -2278,8 +2362,6 @@ void ConvertToMinorCase(
     ref TOKEN[] token_array
     )
 {
-    MergeIdentifiers( token_array );
-
     foreach ( token; token_array )
     {
         if ( token.IsIdentifier() )
@@ -2295,8 +2377,6 @@ void ConvertToMajorCase(
     ref TOKEN[] token_array
     )
 {
-    MergeIdentifiers( token_array );
-
     foreach ( token; token_array )
     {
         if ( token.IsIdentifier() )
@@ -2312,8 +2392,6 @@ void ConvertToSnakeCase(
     ref TOKEN[] token_array
     )
 {
-    MergeIdentifiers( token_array );
-
     foreach ( token; token_array )
     {
         if ( token.IsIdentifier() )
@@ -2329,8 +2407,6 @@ void ConvertToPascalCase(
     ref TOKEN[] token_array
     )
 {
-    MergeIdentifiers( token_array );
-
     foreach ( token; token_array )
     {
         if ( token.IsIdentifier() )
@@ -2346,8 +2422,6 @@ void ConvertToCamelCase(
     ref TOKEN[] token_array
     )
 {
-    MergeIdentifiers( token_array );
-
     foreach ( token; token_array )
     {
         if ( token.IsIdentifier() )
@@ -2365,8 +2439,6 @@ void ReplacePrefix(
     string new_prefix
     )
 {
-    MergeIdentifiers( token_array );
-
     if ( token_array.length > 0
          && token_array[ 0 ].IsIdentifier() )
     {
@@ -2382,8 +2454,6 @@ void ReplaceSuffix(
     string new_suffix
     )
 {
-    MergeIdentifiers( token_array );
-
     if ( token_array.length > 0
          && token_array[ 0 ].IsIdentifier() )
     {
@@ -2399,8 +2469,6 @@ void ReplaceText(
     string new_text
     )
 {
-    MergeIdentifiers( token_array );
-
     foreach ( token; token_array )
     {
         ReplaceText( token.Text, old_text, new_text );
@@ -2415,8 +2483,6 @@ void ReplaceIdentifier(
     string new_identifier
     )
 {
-    MergeIdentifiers( token_array );
-
     foreach ( token; token_array )
     {
         if ( token.IsIdentifier()
@@ -2434,8 +2500,6 @@ void RemovePrefix(
     string prefix
     )
 {
-    MergeIdentifiers( token_array );
-
     if ( token_array.length > 0
          && token_array[ 0 ].IsIdentifier() )
     {
@@ -2450,8 +2514,6 @@ void RemoveSuffix(
     string suffix
     )
 {
-    MergeIdentifiers( token_array );
-
     if ( token_array.length > 0
          && token_array[ 0 ].IsIdentifier() )
     {
@@ -2466,8 +2528,6 @@ void RemoveText(
     string text
     )
 {
-    MergeIdentifiers( token_array );
-
     foreach ( token; token_array )
     {
         ReplaceText( token.Text, text, "" );
@@ -2483,8 +2543,6 @@ void RemoveIdentifier(
 {
     TOKEN[]
         new_token_array;
-
-    MergeIdentifiers( token_array );
 
     foreach ( token; token_array )
     {

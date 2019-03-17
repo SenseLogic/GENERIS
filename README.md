@@ -216,30 +216,37 @@ func main()
 #end
 ```
 
-
-### Old code variable
+### Old code parameter
 
 ```cpp
-{{variable name}} : code block
-{{variable name#}} : expression block
-{{variable name$}} : text block
-{{variable name:condition}}
+{{variable name}} : hierarchical code
+{{variable name#}} : statement code (without semicolon)
+{{variable name$}} : code
+{{variable name:condition}} : conditional hierarchical code
+{{variable name#:condition}} : conditional statement code
+{{variable name$:condition}} : conditional code
 ```
 
-### Condition
+### Old code condition
 
 ```cpp
+HasText text
 HasPrefix prefix
 HasSuffix suffix
-HasText text
 HasIdentifier text
 ```
 
-### New code variable
+Sample :
+
+```cpp
+{{collection:HasSuffix "Array" || HasSuffix "Map"}}
+```
+
+### New code parameter
 
 {{variable name:filter:filter:...}}
 
-### Filter
+### New code filter
 
 ```cpp
 LowerCase
@@ -249,25 +256,18 @@ MajorCase
 SnakeCase
 PascalCase
 CamelCase
+RemoveComments
+RemoveBlanks
+PackStrings
+PackIdentifiers
+ReplaceText old_text new_text
 ReplacePrefix old_prefix new_prefix
 ReplaceSuffix old_suffix new_suffix
-ReplaceText old_text new_text
 ReplaceIdentifier old_identifier new_identifier
+RemoveText text
 RemovePrefix prefix
 RemoveSuffix suffix
-RemoveText text
 RemoveIdentifier identifier
-```
-
-### Boolean expression
-
-```
-false
-true
-!expression
-expression && expression
-expression || expression
-( expression )
 ```
 
 ## Installation
