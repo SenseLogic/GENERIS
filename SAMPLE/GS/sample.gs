@@ -77,9 +77,7 @@ import (
 // ~~
 
 #define DeclareStack( {{type}} )
-#as
-    DeclareStack( {{type}}, {{type:PascalCase}} )
-#end
+#as DeclareStack( {{type}}, {{type:PascalCase}} )
 
 // -- TYPES
 
