@@ -226,19 +226,25 @@ func main()
 ```cpp
 {{variable name}} : hierarchical code
 {{variable name#}} : statement code (without semicolon)
-{{variable name$}} : code
+{{variable name$}} : plain code
 {{variable name:boolean expression}} : conditional hierarchical code
 {{variable name#:boolean expression}} : conditional statement code
-{{variable name$:boolean expression}} : conditional code
+{{variable name$:boolean expression}} : conditional plain code
 ```
 
-### Old code boolean function
+### Old code boolean expression
 
 ```cpp
 HasText text
 HasPrefix prefix
 HasSuffix suffix
 HasIdentifier text
+false
+true
+!expression
+expression && expression
+expression || expression
+( expression )
 ```
 
 ### New code parameter
@@ -278,7 +284,6 @@ RemoveIdentifier identifier
 ```
 false
 true
-function call
 !expression
 expression && expression
 expression || expression
