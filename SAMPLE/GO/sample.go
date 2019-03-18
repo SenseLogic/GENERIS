@@ -120,8 +120,8 @@ func HandleRootPage( response_writer http.ResponseWriter, request * http.Request
     io.WriteString( response_writer, "\n            " );
     io.WriteString( response_writer, html.EscapeString( escaped_text ) );
     io.WriteString( response_writer, "\n            " );
-    io.WriteString( response_writer, html.EscapeString( "<% ignored %>" ) );
-    io.WriteString( response_writer, "\n        " );
+    io.WriteString( response_writer, html.EscapeString( "<%% ignored %>" ) );
+    io.WriteString( response_writer, "\n            <% ignored %%>\n        " );
  }
     io.WriteString( response_writer, "\n        <br/>\n        Stack :\n        <br/>\n        " );
  for !integer_stack.IsEmpty() {

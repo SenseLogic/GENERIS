@@ -154,7 +154,8 @@ func HandleRootPage(
                 <%& real_32 %><%& real_64 %>
                 <%~ text %>
                 <%= escaped_text %>
-                <%= "<\% ignored %\>" %>
+                <%= "<%% ignored %%>" %>
+                <%% ignored %%>
             </body>
         </html>
     #end

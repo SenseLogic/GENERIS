@@ -133,7 +133,8 @@ func HandleRootPage(
                     <br/>
                     <%~ text %>
                     <%= escaped_text %>
-                    <%= "<\% ignored %\>" %>
+                    <%= "<%% ignored %%>" %>
+                    <%% ignored %%>
                 <% } %>
                 <br/>
                 Stack :

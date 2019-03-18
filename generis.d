@@ -1507,7 +1507,6 @@ class FILE
             next_character;
         long
             character_index,
-            first_character_index,
             state;
         string
             empty_string_writer_line,
@@ -1537,91 +1536,113 @@ class FILE
             {
                 character = text[ character_index ];
 
-                if ( character_index + 2 < text.length
-                     && character == '<'
-                     && text[ character_index + 1 ] == '%'
-                     && text[ character_index + 2 ] != '!' )
+                if ( character == '<'
+                     && character_index + 1 < text.length
+                     && text[ character_index + 1 ] == '%' )
                 {
-                    writer_line_array[ $ - 1 ] ~= string_writer_suffix;
-
-                    character_index += 2;
-
-                    first_character_index = character_index;
-
-                    while ( character_index < text.length )
+                    if ( character_index + 2 < text.length
+                         && text[ character_index + 2 ] == '%' )
                     {
-                        if ( text[ character_index ] == '%'
-                             && character_index + 1 < text.length
-                             && text[ character_index + 1 ] == '>' )
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            ++character_index;
-                        }
-                    }
+                        writer_line_array[ $ - 1 ] ~= "<%";
 
-                    if ( character_index == text.length )
-                    {
-                        writeln( text );
-
-                        AbortFile( "Missing %>" );
-                    }
-
-                    writer_text = text[ first_character_index .. character_index ];
-
-                    ++character_index;
-
-                    if ( writer_text.startsWith( '@' ) )
-                    {
-                        writer_line_array
-                            ~= writer_prefix
-                               ~ "strconv.FormatUint( uint64( "
-                               ~ writer_text[ 1 .. $ ].strip()
-                               ~ " ), 10 )"
-                               ~ writer_suffix;
-                    }
-                    else if ( writer_text.startsWith( '#' ) )
-                    {
-                        writer_line_array
-                            ~= writer_prefix
-                               ~ "strconv.FormatInt( int64( "
-                               ~ writer_text[ 1 .. $ ].strip()
-                               ~ " ), 10 )"
-                               ~ writer_suffix;
-                    }
-                    else if ( writer_text.startsWith( '&' ) )
-                    {
-                        writer_line_array
-                            ~= writer_prefix
-                               ~ "strconv.FormatFloat( float64( "
-                               ~ writer_text[ 1 .. $ ].strip()
-                               ~ " ), 'f', -1, 64 )"
-                               ~ writer_suffix;
-                    }
-                    else if ( writer_text.startsWith( '~' ) )
-                    {
-                        writer_line_array
-                            ~= writer_prefix
-                               ~ writer_text[ 1 .. $ ].strip()
-                               ~ writer_suffix;
-                    }
-                    else if ( writer_text.startsWith( '=' ) )
-                    {
-                        writer_line_array
-                            ~= writer_prefix
-                               ~ "html.EscapeString( "
-                               ~ writer_text[ 1 .. $ ].strip()
-                               ~ " )"
-                               ~ writer_suffix;
+                        character_index += 2;
                     }
                     else
                     {
-                        writer_line_array ~= writer_text;
-                    }
+                        writer_text = "";
+                        character_index += 2;
 
-                    writer_line_array ~= string_writer_prefix;
+                        while ( character_index < text.length )
+                        {
+                            character = text[ character_index ];
+
+                            if ( character == '%'
+                                 && character_index + 1 < text.length
+                                 && text[ character_index + 1 ] == '>' )
+                            {
+                                ++character_index;
+
+                                break;
+                            }
+                            else if ( character == '%'
+                                      && character_index + 2 < text.length
+                                      && text[ character_index + 1 ] == '%'
+                                      && text[ character_index + 2 ] == '>' )
+                            {
+                                writer_text ~= "%>";
+
+                                character_index += 3;
+                            }
+                            else
+                            {
+                                writer_text ~= character;
+
+                                ++character_index;
+                            }
+                        }
+
+                        if ( character_index == text.length )
+                        {
+                            writeln( text );
+
+                            AbortFile( "Missing %>" );
+                        }
+
+                        if ( !writer_text.startsWith( '!' ) )
+                        {
+                            writer_line_array[ $ - 1 ] ~= string_writer_suffix;
+
+                            if ( writer_text.startsWith( '@' ) )
+                            {
+                                writer_line_array
+                                    ~= writer_prefix
+                                       ~ "strconv.FormatUint( uint64( "
+                                       ~ writer_text[ 1 .. $ ].strip()
+                                       ~ " ), 10 )"
+                                       ~ writer_suffix;
+                            }
+                            else if ( writer_text.startsWith( '#' ) )
+                            {
+                                writer_line_array
+                                    ~= writer_prefix
+                                       ~ "strconv.FormatInt( int64( "
+                                       ~ writer_text[ 1 .. $ ].strip()
+                                       ~ " ), 10 )"
+                                       ~ writer_suffix;
+                            }
+                            else if ( writer_text.startsWith( '&' ) )
+                            {
+                                writer_line_array
+                                    ~= writer_prefix
+                                       ~ "strconv.FormatFloat( float64( "
+                                       ~ writer_text[ 1 .. $ ].strip()
+                                       ~ " ), 'f', -1, 64 )"
+                                       ~ writer_suffix;
+                            }
+                            else if ( writer_text.startsWith( '=' ) )
+                            {
+                                writer_line_array
+                                    ~= writer_prefix
+                                       ~ "html.EscapeString( "
+                                       ~ writer_text[ 1 .. $ ].strip()
+                                       ~ " )"
+                                       ~ writer_suffix;
+                            }
+                            else if ( writer_text.startsWith( '~' ) )
+                            {
+                                writer_line_array
+                                    ~= writer_prefix
+                                       ~ writer_text[ 1 .. $ ].strip()
+                                       ~ writer_suffix;
+                            }
+                            else
+                            {
+                                writer_line_array ~= writer_text;
+                            }
+
+                            writer_line_array ~= string_writer_prefix;
+                        }
+                    }
                 }
                 else
                 {
@@ -1654,7 +1675,7 @@ class FILE
             }
         }
 
-        return template_line_array.join( '\n' ).replace( "<\\%", "<%" ).replace( "%\\>", "%>" );
+        return template_line_array.join( '\n' );
     }
 
     // ~~
