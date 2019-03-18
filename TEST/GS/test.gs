@@ -140,7 +140,7 @@ func HandleRootPage(
         <html lang="en">
             <head>
                 <meta charset="utf-8">
-                <title><%~ request.URL.Path %></title>
+                <title><%= request.URL.Path %></title>
             </head>
             <body>
                 <%
@@ -152,9 +152,9 @@ func HandleRootPage(
                 <%@ natural_8 %><%@ natural_16 %><%@ natural_32 %><%@ natural_64 %>
                 <%# integer_8 %><%# integer_16 %><%# integer_32 %><%# integer_64 %>
                 <%& real_32 %><%& real_64 %>
-                <%= text %>
-                <%~ escaped_text %>
-                <%~ "<\% ignored %\>" %>
+                <%~ text %>
+                <%= escaped_text %>
+                <%= "<\% ignored %\>" %>
             </body>
         </html>
     #end

@@ -121,19 +121,19 @@ func HandleRootPage(
         <html lang="en">
             <head>
                 <meta charset="utf-8">
-                <title><%~ request.URL.Path %></title>
+                <title><%= request.URL.Path %></title>
             </head>
             <body>
                 <% if ( boolean ) { %>
-                    <%~ "URL : " + request.URL.Path %>
+                    <%= "URL : " + request.URL.Path %>
                     <br/>
                     <%@ natural %>
                     <%# integer %>
                     <%& real %>
                     <br/>
-                    <%= text %>
-                    <%~ escaped_text %>
-                    <%~ "<\% ignored %\>" %>
+                    <%~ text %>
+                    <%= escaped_text %>
+                    <%= "<\% ignored %\>" %>
                 <% } %>
                 <br/>
                 Stack :
