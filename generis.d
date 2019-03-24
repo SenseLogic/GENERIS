@@ -1200,15 +1200,16 @@ class FILE
         SysTime
             old_system_time;
 
+        old_system_time = SystemTime;
+        SystemTime = InputPath.timeLastModified();
+
         if ( modification_time_is_used )
         {
-            HasChanged = true;
+            HasChanged = ( SystemTime > old_system_time );
         }
         else
         {
-            old_system_time = SystemTime;
-            SystemTime = InputPath.timeLastModified();
-            HasChanged = ( SystemTime > old_system_time );
+            HasChanged = true;
         }
 
         IsProcessed

@@ -103,33 +103,33 @@ func HandleRootPage( response_writer http.ResponseWriter, request * http.Request
     integer_stack.Push( 20 );
     integer_stack.Push( 30 );
 
-    io.WriteString( response_writer, "<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <meta charset=\"utf-8\">\n        <title>" );
+    io.WriteString( response_writer, "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>" );
     io.WriteString( response_writer, html.EscapeString( request.URL.Path ) );
-    io.WriteString( response_writer, "</title>\n    </head>\n    <body>\n        " );
+    io.WriteString( response_writer, "</title>\n</head>\n<body>\n" );
  if ( boolean ) {
-    io.WriteString( response_writer, "\n            " );
+    io.WriteString( response_writer, "\n" );
     io.WriteString( response_writer, html.EscapeString( "URL : " + request.URL.Path ) );
-    io.WriteString( response_writer, "\n            <br/>\n            " );
+    io.WriteString( response_writer, "\n<br/>\n" );
     io.WriteString( response_writer, strconv.FormatUint( uint64( natural ), 10 ) );
-    io.WriteString( response_writer, "\n            " );
+    io.WriteString( response_writer, "\n" );
     io.WriteString( response_writer, strconv.FormatInt( int64( integer ), 10 ) );
-    io.WriteString( response_writer, "\n            " );
+    io.WriteString( response_writer, "\n" );
     io.WriteString( response_writer, strconv.FormatFloat( float64( real ), 'f', -1, 64 ) );
-    io.WriteString( response_writer, "\n            <br/>\n            " );
+    io.WriteString( response_writer, "\n<br/>\n" );
     io.WriteString( response_writer, text );
-    io.WriteString( response_writer, "\n            " );
+    io.WriteString( response_writer, "\n" );
     io.WriteString( response_writer, html.EscapeString( escaped_text ) );
-    io.WriteString( response_writer, "\n            " );
+    io.WriteString( response_writer, "\n" );
     io.WriteString( response_writer, html.EscapeString( "<%% ignored %>" ) );
-    io.WriteString( response_writer, "\n            <% ignored %%>\n        " );
+    io.WriteString( response_writer, "\n<% ignored %%>\n" );
  }
-    io.WriteString( response_writer, "\n        <br/>\n        Stack :\n        <br/>\n        " );
+    io.WriteString( response_writer, "\n<br/>\nStack :\n<br/>\n" );
  for !integer_stack.IsEmpty() {
-    io.WriteString( response_writer, "\n            " );
+    io.WriteString( response_writer, "\n" );
     io.WriteString( response_writer, strconv.FormatInt( int64( integer_stack.Pop() ), 10 ) );
-    io.WriteString( response_writer, "\n        " );
+    io.WriteString( response_writer, "\n" );
  }
-    io.WriteString( response_writer, "\n    </body>\n</html>" );
+    io.WriteString( response_writer, "\n</body>\n</html>" );
 }
 
 // ~~

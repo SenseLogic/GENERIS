@@ -329,18 +329,18 @@ One of the `--cs`, `--go` and `--js` options must be used.
 ### Examples
 
 ```bash
-generis --process GS/ GO/ --trim --join --create --go
+generis --process GS/ CS/ --cs
+```
+
+Reads the Generis files in the `GS/` folder and writes C# files in the `CS/` folder.
+
+```bash
+generis --process GS/ GO/ --trim --join --create --watch --go
 ```
 
 Reads the Generis files in the `GS/` folder and writes Go files in the `GO/` folder,
-trimming the HTML templates, joining the split statements and creating the output folders if needed.
-
-```bash
-generis --process GS/ JS/ --create --watch --js
-```
-
-Reads the Generis files in the `GS/` folder and writes JavaScript files in the `JS/` folder,
-creating the output folders if needed and watching the input folders for modifications.
+trimming the HTML templates, joining the split statements, creating the output folders if needed
+and watching the Generis files for modifications.
 
 ## Version
 
