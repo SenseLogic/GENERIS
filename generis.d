@@ -1502,6 +1502,8 @@ class FILE
         long space_count
         )
     {
+        bool
+            it_is_first_space;
         char
             character,
             next_character;
@@ -1530,6 +1532,8 @@ class FILE
             text = template_line_array.join( '\n' );
             writer_line_array ~= string_writer_prefix;
 
+            it_is_first_space = true;
+
             for ( character_index = 0;
                   character_index < text.length;
                   ++character_index )
@@ -1540,6 +1544,8 @@ class FILE
                      && character_index + 1 < text.length
                      && text[ character_index + 1 ] == '%' )
                 {
+                    it_is_first_space = false;
+
                     if ( character_index + 2 < text.length
                          && text[ character_index + 2 ] == '%' )
                     {
@@ -1646,17 +1652,31 @@ class FILE
                 }
                 else
                 {
-                    if ( character == '"' )
+                    if ( character == ' ' )
+                    {
+                        if ( !it_is_first_space
+                             || !TrimOptionIsEnabled )
+                        {
+                            writer_line_array[ $ - 1 ] ~= ' ';
+                        }
+                    }
+                    else if ( character == '"' )
                     {
                         writer_line_array[ $ - 1 ] ~= "\\\"";
+
+                        it_is_first_space = false;
                     }
                     else if ( character == '\n' )
                     {
                         writer_line_array[ $ - 1 ] ~= "\\n";
+
+                        it_is_first_space = true;
                     }
                     else
                     {
                         writer_line_array[ $ - 1 ] ~= character;
+
+                        it_is_first_space = false;
                     }
                 }
             }
@@ -1960,8 +1980,12 @@ class FILE
 // -- VARIABLES
 
 bool
+    CsOptionIsEnabled,
     CreateOptionIsEnabled,
+    GoOptionIsEnabled,
+    JsOptionIsEnabled,
     JoinOptionIsEnabled,
+    TrimOptionIsEnabled,
     WatchOptionIsEnabled;
 string
     SpaceText;
@@ -2946,10 +2970,24 @@ void FindInputFiles(
                     }
                     else
                     {
-                        output_file_path
-                            = output_folder_path
-                              ~ input_file_path[ input_folder_path.length .. $ - 3 ]
-                              ~ ".go";
+                        output_file_path = output_folder_path ~ input_file_path[ input_folder_path.length .. $ - 3 ];
+
+                        if ( CsOptionIsEnabled )
+                        {
+                            output_file_path ~= ".cs";
+                        }
+                        else if ( GoOptionIsEnabled )
+                        {
+                            output_file_path ~= ".go";
+                        }
+                        else if ( JsOptionIsEnabled )
+                        {
+                            output_file_path ~= ".js";
+                        }
+                        else
+                        {
+                            Abort( "Missing output option" );
+                        }
                     }
 
                     found_file = input_file_path in FileMap;
@@ -3079,11 +3117,15 @@ void main(
 
     InputFolderPathArray = null;
     OutputFolderPathArray = null;
+    TrimOptionIsEnabled = false;
     JoinOptionIsEnabled = false;
     CreateOptionIsEnabled = false;
     WatchOptionIsEnabled = false;
     PauseDuration = 500;
     TabulationSpaceCount = 4;
+    CsOptionIsEnabled = false;
+    GoOptionIsEnabled = false;
+    JsOptionIsEnabled = false;
 
     while ( argument_array.length >= 1
             && argument_array[ 0 ].startsWith( "--" ) )
@@ -3111,6 +3153,10 @@ void main(
 
             argument_array = argument_array[ 2 .. $ ];
         }
+        else if ( option == "--trim" )
+        {
+            TrimOptionIsEnabled = true;
+        }
         else if ( option == "--join" )
         {
             JoinOptionIsEnabled = true;
@@ -3137,13 +3183,34 @@ void main(
 
             argument_array = argument_array[ 1 .. $ ];
         }
+        else if ( option == "--cs"
+                  && !GoOptionIsEnabled
+                  && !JsOptionIsEnabled )
+        {
+            CsOptionIsEnabled = true;
+        }
+        else if ( option == "--go"
+                  && !CsOptionIsEnabled
+                  && !JsOptionIsEnabled )
+        {
+            GoOptionIsEnabled = true;
+        }
+        else if ( option == "--js"
+                  && !CsOptionIsEnabled
+                  && !GoOptionIsEnabled )
+        {
+            JsOptionIsEnabled = true;
+        }
         else
         {
             PrintError( "Invalid option : " ~ option );
         }
     }
 
-    if ( argument_array.length == 0 )
+    if ( argument_array.length == 0
+         && ( CsOptionIsEnabled
+              || GoOptionIsEnabled
+              || JsOptionIsEnabled ) )
     {
         if ( WatchOptionIsEnabled )
         {
@@ -3161,16 +3228,29 @@ void main(
         writeln( "Options :" );
         writeln( "    --parse INPUT_FOLDER/" );
         writeln( "    --process INPUT_FOLDER/ OUTPUT_FOLDER/" );
+        writeln( "    --trim" );
         writeln( "    --join" );
         writeln( "    --create" );
         writeln( "    --watch" );
         writeln( "    --pause 500" );
         writeln( "    --tabulation 4" );
+        writeln( "    --cs" );
+        writeln( "    --go" );
+        writeln( "    --js" );
         writeln( "Examples :" );
-        writeln( "    generis GS/ GO/" );
-        writeln( "    generis --create GS/ GO/" );
-        writeln( "    generis --create --watch GS/ GO/" );
+        writeln( "    generis --process GS/ GO/ --go" );
+        writeln( "    generis --process GS/ GO/ --create --go" );
+        writeln( "    generis --process GS/ GO/ --create --watch --go" );
 
-        PrintError( "Invalid arguments : " ~ argument_array.to!string() );
+        if ( !CsOptionIsEnabled
+             && !GoOptionIsEnabled
+             && !JsOptionIsEnabled )
+        {
+            PrintError( "Missing output language option" );
+        }
+        else
+        {
+            PrintError( "Invalid arguments : " ~ argument_array.to!string() );
+        }
     }
 }

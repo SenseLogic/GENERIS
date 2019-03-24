@@ -2,7 +2,7 @@
 
 # Generis
 
-Go code generator.
+Template code generator.
 
 ## Sample
 
@@ -218,8 +218,8 @@ func main()
     <%& real expression %>
     <%~ escaped text expression %>
     <%= unescaped text expression %>
-    <%! ignored comment %>
-    <%% escaped tag %%>
+    <%! removed content %>
+    <%% ignored tags %%>
 #end
 ```
 
@@ -311,22 +311,36 @@ generis [options]
 ### Options
 
 ```
---parse INPUT_FOLDER/ : parse the definitions from the Generis files of this folder
---process INPUT_FOLDER/ OUTPUT_FOLDER/ : processes the Generis files of the input folder to generate Go files in the output folder
---join : join split statements
+--parse INPUT_FOLDER/ : parse the definitions of the Generis files in this folder
+--process INPUT_FOLDER/ OUTPUT_FOLDER/ : reads the Generis files in the first folder and writes the processed files in the second folder
+--trim : trim the HTML templates
+--join : join the split statements
 --create : create the output folders if needed
 --watch : watch the Generis files for modifications
 --pause 500 : time to wait before checking the Generis files again
 --tabulation 4 : set the tabulation space count
+--cs : generate C# files
+--go : generate Go files
+--js : generate JavaScript files
 ```
+
+One of the `--cs`, `--go` and `--js` options must be used.
 
 ### Examples
 
 ```bash
-generis --process GS/ GO/ --join
+generis --process GS/ GO/ --trim --join --create --go
 ```
 
-Processes the Generis files of the input folder to generate Go files in the output folder, and joins the split statements.
+Reads the Generis files in the `GS/` folder and writes Go files in the `GO/` folder,
+trimming the HTML templates, joining the split statements and creating the output folders if needed.
+
+```bash
+generis --process GS/ JS/ --create --watch --js
+```
+
+Reads the Generis files in the `GS/` folder and writes JavaScript files in the `JS/` folder,
+creating the output folders if needed and watching the input folders for modifications.
 
 ## Version
 

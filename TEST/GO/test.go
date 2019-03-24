@@ -66,32 +66,32 @@ func HandleRootPage( response_writer http.ResponseWriter, request * http.Request
     text = "text";
     escaped_text = "<escaped text/>";
 
-    io.WriteString( response_writer, "<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <meta charset=\"utf-8\">\n        <title>" );
+    io.WriteString( response_writer, "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>" );
     io.WriteString( response_writer, html.EscapeString( request.URL.Path ) );
-    io.WriteString( response_writer, "</title>\n    </head>\n    <body>\n        " );
+    io.WriteString( response_writer, "</title>\n</head>\n<body>\n" );
 
         io.WriteString( response_writer, html.EscapeString( "URL=" + request.URL.Path ) );
 
-    io.WriteString( response_writer, "\n        " );
+    io.WriteString( response_writer, "\n" );
     io.WriteString( response_writer, strconv.FormatUint( uint64( natural_8 ), 10 ) );
     io.WriteString( response_writer, strconv.FormatUint( uint64( natural_16 ), 10 ) );
     io.WriteString( response_writer, strconv.FormatUint( uint64( natural_32 ), 10 ) );
     io.WriteString( response_writer, strconv.FormatUint( uint64( natural_64 ), 10 ) );
-    io.WriteString( response_writer, "\n        " );
+    io.WriteString( response_writer, "\n" );
     io.WriteString( response_writer, strconv.FormatInt( int64( integer_8 ), 10 ) );
     io.WriteString( response_writer, strconv.FormatInt( int64( integer_16 ), 10 ) );
     io.WriteString( response_writer, strconv.FormatInt( int64( integer_32 ), 10 ) );
     io.WriteString( response_writer, strconv.FormatInt( int64( integer_64 ), 10 ) );
-    io.WriteString( response_writer, "\n        " );
+    io.WriteString( response_writer, "\n" );
     io.WriteString( response_writer, strconv.FormatFloat( float64( real_32 ), 'f', -1, 64 ) );
     io.WriteString( response_writer, strconv.FormatFloat( float64( real_64 ), 'f', -1, 64 ) );
-    io.WriteString( response_writer, "\n        " );
+    io.WriteString( response_writer, "\n" );
     io.WriteString( response_writer, text );
-    io.WriteString( response_writer, "\n        " );
+    io.WriteString( response_writer, "\n" );
     io.WriteString( response_writer, html.EscapeString( escaped_text ) );
-    io.WriteString( response_writer, "\n        " );
+    io.WriteString( response_writer, "\n" );
     io.WriteString( response_writer, html.EscapeString( "<%% ignored %>" ) );
-    io.WriteString( response_writer, "\n        <% ignored %%>\n    </body>\n</html>" );
+    io.WriteString( response_writer, "\n<% ignored %%>\n</body>\n</html>" );
 
 log.Println( "true && true" );
 
