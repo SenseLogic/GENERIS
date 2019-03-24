@@ -2,7 +2,15 @@
 
 # Generis
 
-Template code generator.
+Go code generator.
+
+## Description
+
+Generis is a lightweight code preprocessor adding the following features to the Go language :
+
+*   Generic code definition and instantiation.
+*   ERB-like HTML templating.
+*   Allman to K&R style conversion.
 
 ## Sample
 
