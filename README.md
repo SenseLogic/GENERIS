@@ -2,7 +2,7 @@
 
 # Generis
 
-Versatile go code generator.
+Versatile Go code generator.
 
 ## Description
 
