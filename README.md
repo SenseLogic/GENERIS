@@ -8,10 +8,11 @@ Versatile Go code generator.
 
 Generis is a lightweight code preprocessor adding the following features to the Go language :
 
-*   Generic code definition and instantiation.
+*   Generics.
+*   Free-form macros.
 *   Conditional compilation.
-*   ERB-like HTML templating.
-*   Allman to K&R style conversion.
+*   HTML templating.
+*   Allman style conversion.
 
 ## Sample
 
