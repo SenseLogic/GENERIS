@@ -158,6 +158,6 @@ func main()
     #end
 
     log.Fatal(
-        http.ListenAndServe( ":8080", nil )
+        http.ListenAndServe( ":HttpPort", nil )
         );
 }
