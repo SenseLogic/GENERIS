@@ -2973,13 +2973,13 @@ void FindInputFiles(
                     {
                         output_file_path = output_folder_path ~ input_file_path[ input_folder_path.length .. $ - 3 ];
 
-                        if ( CsOptionIsEnabled )
-                        {
-                            output_file_path ~= ".cs";
-                        }
-                        else if ( GoOptionIsEnabled )
+                        if ( GoOptionIsEnabled )
                         {
                             output_file_path ~= ".go";
+                        }
+                        else if ( CsOptionIsEnabled )
+                        {
+                            output_file_path ~= ".cs";
                         }
                         else if ( JsOptionIsEnabled )
                         {
@@ -3124,8 +3124,8 @@ void main(
     WatchOptionIsEnabled = false;
     PauseDuration = 500;
     TabulationSpaceCount = 4;
-    CsOptionIsEnabled = false;
     GoOptionIsEnabled = false;
+    CsOptionIsEnabled = false;
     JsOptionIsEnabled = false;
 
     while ( argument_array.length >= 1
@@ -3184,21 +3184,21 @@ void main(
 
             argument_array = argument_array[ 1 .. $ ];
         }
-        else if ( option == "--cs"
-                  && !GoOptionIsEnabled
-                  && !JsOptionIsEnabled )
-        {
-            CsOptionIsEnabled = true;
-        }
         else if ( option == "--go"
                   && !CsOptionIsEnabled
                   && !JsOptionIsEnabled )
         {
             GoOptionIsEnabled = true;
         }
+        else if ( option == "--cs"
+                  && !GoOptionIsEnabled
+                  && !JsOptionIsEnabled )
+        {
+            CsOptionIsEnabled = true;
+        }
         else if ( option == "--js"
-                  && !CsOptionIsEnabled
-                  && !GoOptionIsEnabled )
+                  && !GoOptionIsEnabled
+                  && !CsOptionIsEnabled )
         {
             JsOptionIsEnabled = true;
         }
@@ -3209,8 +3209,8 @@ void main(
     }
 
     if ( argument_array.length == 0
-         && ( CsOptionIsEnabled
-              || GoOptionIsEnabled
+         && ( GoOptionIsEnabled
+              || CsOptionIsEnabled
               || JsOptionIsEnabled ) )
     {
         if ( WatchOptionIsEnabled )
@@ -3235,16 +3235,16 @@ void main(
         writeln( "    --watch" );
         writeln( "    --pause 500" );
         writeln( "    --tabulation 4" );
-        writeln( "    --cs" );
         writeln( "    --go" );
+        writeln( "    --cs" );
         writeln( "    --js" );
         writeln( "Examples :" );
         writeln( "    generis --process GS/ GO/ --go" );
         writeln( "    generis --process GS/ GO/ --create --go" );
         writeln( "    generis --process GS/ GO/ --create --watch --go" );
 
-        if ( !CsOptionIsEnabled
-             && !GoOptionIsEnabled
+        if ( !GoOptionIsEnabled
+             && !CsOptionIsEnabled
              && !JsOptionIsEnabled )
         {
             PrintError( "Missing output language option" );

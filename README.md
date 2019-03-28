@@ -226,8 +226,8 @@ func main()
     <%@ natural expression %>
     <%# integer expression %>
     <%& real expression %>
-    <%~ escaped text expression %>
-    <%= unescaped text expression %>
+    <%~ text expression %>
+    <%= escaped text expression %>
     <%! removed content %>
     <%% ignored tags %%>
 #end
@@ -321,28 +321,28 @@ generis [options]
 ### Options
 
 ```
---parse INPUT_FOLDER/ : parse the definitions of the Generis files in this folder
---process INPUT_FOLDER/ OUTPUT_FOLDER/ : reads the Generis files in the first folder and writes the processed files in the second folder
+--parse INPUT_FOLDER/ : parse the definitions of the Generis files in the input folder
+--process INPUT_FOLDER/ OUTPUT_FOLDER/ : reads the Generis files in the input folder and writes the processed files in the output folder
 --trim : trim the HTML templates
 --join : join the split statements
 --create : create the output folders if needed
 --watch : watch the Generis files for modifications
 --pause 500 : time to wait before checking the Generis files again
 --tabulation 4 : set the tabulation space count
---cs : generate C# files
 --go : generate Go files
+--cs : generate C# files
 --js : generate JavaScript files
 ```
 
-One of the `--cs`, `--go` and `--js` options must be used.
+One of the `--go`, `--cs` or `--js` options must be used.
 
 ### Examples
 
 ```bash
-generis --process GS/ CS/ --cs
+generis --process GS/ GO/ --go
 ```
 
-Reads the Generis files in the `GS/` folder and writes C# files in the `CS/` folder.
+Reads the Generis files in the `GS/` folder and writes Go files in the `GO/` folder.
 
 ```bash
 generis --process GS/ GO/ --trim --join --create --watch --go
