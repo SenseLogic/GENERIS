@@ -327,6 +327,7 @@ Templated HTML code can be sent to a stream writer using the following syntax :
 ## Limitations
 
 *   There is no operator precedence in boolean expressions.
+*   The `--join` option requires to end the statements with a semicolon.
 *   The `#writer` directive is only available for the Go language.
 
 ## Installation
