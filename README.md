@@ -225,7 +225,7 @@ The `#define` directive can contain one or several parameters :
 {{variable name$:boolean expression}} : conditional plain code
 ```
 
-They can have a boolean expression to add a condition on their value :
+They can have a boolean expression to require they match specific conditions :
 
 ```go
 HasText text
