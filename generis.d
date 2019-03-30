@@ -3242,6 +3242,7 @@ void main(
         writeln( "    generis --process GS/ GO/ --go" );
         writeln( "    generis --process GS/ GO/ --create --go" );
         writeln( "    generis --process GS/ GO/ --create --watch --go" );
+        writeln( "    generis --process GS/ GO/ --trim --join --create --watch --go" );
 
         if ( !GoOptionIsEnabled
              && !CsOptionIsEnabled

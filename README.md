@@ -182,7 +182,11 @@ func main()
 }
 ```
 
-### Commands
+## Syntax
+
+### #define directive
+
+Constants and generic code can be defined with the following syntax :
 
 ```cpp
 #define old code
@@ -205,46 +209,23 @@ func main()
 #as
     new
     code
-#end
-
-#if boolean expression
-    #if boolean expression
-        ...
-    #else
-        ...
-    #end
-#else
-    #if boolean expression
-        ...
-    #else
-        ...
-    #end
-#end
-
-#write writer expression
-    <% code %>
-    <%@ natural expression %>
-    <%# integer expression %>
-    <%& real expression %>
-    <%~ text expression %>
-    <%= escaped text expression %>
-    <%! removed content %>
-    <%% ignored tags %%>
 #end
 ```
 
-### Old code parameter
+#### #define parameter
+
+The `#define` directive can contain one or several parameters :
 
 ```cpp
-{{variable name}} : hierarchical code
-{{variable name#}} : statement code (without semicolon)
+{{variable name}} : hierarchical code (with properly matching brackets and parentheses)
+{{variable name#}} : statement code (hierarchical code without semicolon)
 {{variable name$}} : plain code
 {{variable name:boolean expression}} : conditional hierarchical code
 {{variable name#:boolean expression}} : conditional statement code
 {{variable name$:boolean expression}} : conditional plain code
 ```
 
-### Old code boolean expression
+They can have a boolean expression to add a condition on their value :
 
 ```cpp
 HasText text
@@ -259,7 +240,11 @@ expression || expression
 ( expression )
 ```
 
-### New code parameter
+The `#define` directive must not start or end with a parameter.
+
+#### #as parameter
+
+The `#as` directive can use the value of the `#define` parameters :
 
 ```cpp
 {{variable name}}
@@ -267,7 +252,7 @@ expression || expression
 {{variable name:filter function:filter function:...}}
 ```
 
-### New code filter function
+Their value can be changed through one or several filter functions :
 
 ```cpp
 LowerCase
@@ -291,7 +276,27 @@ RemoveSuffix suffix
 RemoveIdentifier identifier
 ```
 
-### Boolean expression
+### #if directive
+
+Conditional code can be defined with the following syntax :
+
+```cpp
+#if boolean expression
+    #if boolean expression
+        ...
+    #else
+        ...
+    #end
+#else
+    #if boolean expression
+        ...
+    #else
+        ...
+    #end
+#end
+```
+
+The boolean expression can use the following operators :
 
 ```
 false
@@ -301,6 +306,28 @@ expression && expression
 expression || expression
 ( expression )
 ```
+
+### #write directive
+
+Templated HTML code can be sent to a stream writer using the following syntax :
+
+```cpp
+#write writer expression
+    <% code %>
+    <%@ natural expression %>
+    <%# integer expression %>
+    <%& real expression %>
+    <%~ text expression %>
+    <%= escaped text expression %>
+    <%! removed content %>
+    <%% ignored tags %%>
+#end
+```
+
+## Limitations
+
+*   There is no operator precedence in boolean expressions.
+*   The `#writer` directive is only available for the Go language.
 
 ## Installation
 
@@ -343,6 +370,20 @@ generis --process GS/ GO/ --go
 ```
 
 Reads the Generis files in the `GS/` folder and writes Go files in the `GO/` folder.
+
+```bash
+generis --process GS/ GO/ --create --go
+```
+
+Reads the Generis files in the `GS/` folder and writes Go files in the `GO/` folder,
+creating the output folders if needed.
+
+```bash
+generis --process GS/ GO/ --create --watch --go
+```
+
+Reads the Generis files in the `GS/` folder and writes Go files in the `GO/` folder,
+creating the output folders if needed and watching the Generis files for modifications.
 
 ```bash
 generis --process GS/ GO/ --trim --join --create --watch --go
