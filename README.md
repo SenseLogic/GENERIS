@@ -188,7 +188,7 @@ func main()
 
 Constants and generic code can be defined with the following syntax :
 
-```cpp
+```go
 #define old code
 #as new code
 
@@ -216,7 +216,7 @@ Constants and generic code can be defined with the following syntax :
 
 The `#define` directive can contain one or several parameters :
 
-```cpp
+```go
 {{variable name}} : hierarchical code (with properly matching brackets and parentheses)
 {{variable name#}} : statement code (hierarchical code without semicolon)
 {{variable name$}} : plain code
@@ -227,7 +227,7 @@ The `#define` directive can contain one or several parameters :
 
 They can have a boolean expression to add a condition on their value :
 
-```cpp
+```go
 HasText text
 HasPrefix prefix
 HasSuffix suffix
@@ -246,7 +246,7 @@ The `#define` directive must not start or end with a parameter.
 
 The `#as` directive can use the value of the `#define` parameters :
 
-```cpp
+```go
 {{variable name}}
 {{variable name:filter function}}
 {{variable name:filter function:filter function:...}}
@@ -254,7 +254,7 @@ The `#as` directive can use the value of the `#define` parameters :
 
 Their value can be changed through one or several filter functions :
 
-```cpp
+```go
 LowerCase
 UpperCase
 MinorCase
@@ -280,7 +280,7 @@ RemoveIdentifier identifier
 
 Conditional code can be defined with the following syntax :
 
-```cpp
+```go
 #if boolean expression
     #if boolean expression
         ...
@@ -298,7 +298,7 @@ Conditional code can be defined with the following syntax :
 
 The boolean expression can use the following operators :
 
-```
+```go
 false
 true
 !expression
@@ -311,7 +311,7 @@ expression || expression
 
 Templated HTML code can be sent to a stream writer using the following syntax :
 
-```cpp
+```html
 #write writer expression
     <% code %>
     <%@ natural expression %>
