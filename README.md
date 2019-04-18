@@ -396,7 +396,7 @@ and watching the Generis files for modifications.
 
 ## Version
 
-0.9
+1.0
 
 ## Author
 
