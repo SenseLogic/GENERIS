@@ -1738,6 +1738,8 @@ class FILE
 
                 space_count = GetSpaceCount( line );
 
+                template_line_array = null;
+
                 while ( line_index < LineArray.length )
                 {
                     line = LineArray[ line_index ].stripRight().RemoveSpaceCount( space_count + TabulationSpaceCount );
