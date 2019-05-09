@@ -26,6 +26,7 @@ import (
     "io"
     "log"
     "net/http"
+    "net/url"
     "strconv"
     );
 
@@ -119,7 +120,8 @@ func HandleRootPage(
     local
         real : float64;
     local
-        escaped_text,
+        escaped_html_text,
+        escaped_url_text,
         text : string;
     local
         integer_stack : Int32Stack;
@@ -129,7 +131,8 @@ func HandleRootPage(
     integer = 20;
     real = 30.0;
     text = "text";
-    escaped_text = "<escaped text/>";
+    escaped_url_text = "&escaped text?";
+    escaped_html_text = "<escaped text/>";
 
     integer_stack.Push( 10 );
     integer_stack.Push( 20 );
@@ -151,7 +154,8 @@ func HandleRootPage(
                     <%& real %>
                     <br/>
                     <%~ text %>
-                    <%= escaped_text %>
+                    <%^ escaped_url_text %>
+                    <%= escaped_html_text %>
                     <%= "<%% ignored %%>" %>
                     <%% ignored %%>
                 <% } %>

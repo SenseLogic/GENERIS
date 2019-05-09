@@ -7,6 +7,7 @@ import (
     "io"
     "log"
     "net/http"
+    "net/url"
     "strconv"
     );
 
@@ -108,7 +109,8 @@ func HandleRootPage(
     var
         integer_64 int64;
     var
-        escaped_text,
+        escaped_html_text,
+        escaped_url_text,
         text string;
     var
         natural_8 uint8;
@@ -133,7 +135,8 @@ func HandleRootPage(
     real_64 = 64.0;
 
     text = "text";
-    escaped_text = "<escaped text/>";
+    escaped_url_text = "&escaped text?";
+    escaped_html_text = "<escaped text/>";
 
     #write response_writer
         <!DOCTYPE html>
@@ -153,7 +156,8 @@ func HandleRootPage(
                 <%# integer_8 %><%# integer_16 %><%# integer_32 %><%# integer_64 %>
                 <%& real_32 %><%& real_64 %>
                 <%~ text %>
-                <%= escaped_text %>
+                <%^ escaped_url_text %>
+                <%= escaped_html_text %>
                 <%= "<%% ignored %%>" %>
                 <%% ignored %%>
             </body>

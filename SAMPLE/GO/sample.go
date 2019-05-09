@@ -6,6 +6,7 @@ import ( "html"
     "io"
     "log"
     "net/http"
+    "net/url"
     "strconv" );
 
 // -- DEFINITIONS
@@ -89,7 +90,7 @@ func HandleRootPage( response_writer http.ResponseWriter, request * http.Request
     var natural uint;
     var integer int;
     var real float64;
-    var escaped_text, text string;
+    var escaped_html_text, escaped_url_text, text string;
     var integer_stack Int32Stack;
 
     boolean = true;
@@ -97,7 +98,8 @@ func HandleRootPage( response_writer http.ResponseWriter, request * http.Request
     integer = 20;
     real = 30.0;
     text = "text";
-    escaped_text = "<escaped text/>";
+    escaped_url_text = "&escaped text?";
+    escaped_html_text = "<escaped text/>";
 
     integer_stack.Push( 10 );
     integer_stack.Push( 20 );
@@ -118,7 +120,9 @@ func HandleRootPage( response_writer http.ResponseWriter, request * http.Request
     io.WriteString( response_writer, "\n<br/>\n" );
     io.WriteString( response_writer, text );
     io.WriteString( response_writer, "\n" );
-    io.WriteString( response_writer, html.EscapeString( escaped_text ) );
+    io.WriteString( response_writer, url.QueryEscape( escaped_url_text ) );
+    io.WriteString( response_writer, "\n" );
+    io.WriteString( response_writer, html.EscapeString( escaped_html_text ) );
     io.WriteString( response_writer, "\n" );
     io.WriteString( response_writer, html.EscapeString( "<%% ignored %>" ) );
     io.WriteString( response_writer, "\n<% ignored %%>\n" );

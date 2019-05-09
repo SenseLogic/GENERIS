@@ -1626,6 +1626,22 @@ class FILE
                                        ~ " ), 'f', -1, 64 )"
                                        ~ writer_suffix;
                             }
+                            else if ( writer_text.startsWith( '~' ) )
+                            {
+                                writer_line_array
+                                    ~= writer_prefix
+                                       ~ writer_text[ 1 .. $ ].strip()
+                                       ~ writer_suffix;
+                            }
+                            else if ( writer_text.startsWith( '^' ) )
+                            {
+                                writer_line_array
+                                    ~= writer_prefix
+                                       ~ "url.QueryEscape( "
+                                       ~ writer_text[ 1 .. $ ].strip()
+                                       ~ " )"
+                                       ~ writer_suffix;
+                            }
                             else if ( writer_text.startsWith( '=' ) )
                             {
                                 writer_line_array
@@ -1633,13 +1649,6 @@ class FILE
                                        ~ "html.EscapeString( "
                                        ~ writer_text[ 1 .. $ ].strip()
                                        ~ " )"
-                                       ~ writer_suffix;
-                            }
-                            else if ( writer_text.startsWith( '~' ) )
-                            {
-                                writer_line_array
-                                    ~= writer_prefix
-                                       ~ writer_text[ 1 .. $ ].strip()
                                        ~ writer_suffix;
                             }
                             else
