@@ -519,7 +519,7 @@ class CODE
         )
     {
         bool
-            match_was_found,
+            match_is_found,
             code_has_changed;
         long
             token_index;
@@ -530,7 +530,7 @@ class CODE
 
         do
         {
-            match_was_found = false;
+            match_is_found = false;
 
             for ( token_index = 0;
                   token_index < TokenArray.length;
@@ -555,14 +555,14 @@ class CODE
 
                 if ( match !is null )
                 {
-                    match_was_found = true;
+                    match_is_found = true;
                     code_has_changed = true;
 
                     --token_index;
                 }
             }
         }
-        while ( match_was_found );
+        while ( match_is_found );
 
         return code_has_changed;
     }
