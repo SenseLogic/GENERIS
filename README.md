@@ -362,37 +362,33 @@ generis [options]
 --watch : watch the Generis files for modifications
 --pause 500 : time to wait before checking the Generis files again
 --tabulation 4 : set the tabulation space count
---go : generate Go files
---cs : generate C# files
---js : generate JavaScript files
+--extension .go : generate files with this extension
 ```
-
-One of the `--go`, `--cs` or `--js` options must be used.
 
 ### Examples
 
 ```bash
-generis --process GS/ GO/ --go
+generis --process GS/ GO/
 ```
 
 Reads the Generis files in the `GS/` folder and writes Go files in the `GO/` folder.
 
 ```bash
-generis --process GS/ GO/ --create --go
+generis --process GS/ GO/ --create
 ```
 
 Reads the Generis files in the `GS/` folder and writes Go files in the `GO/` folder,
 creating the output folders if needed.
 
 ```bash
-generis --process GS/ GO/ --create --watch --go
+generis --process GS/ GO/ --create --watch
 ```
 
 Reads the Generis files in the `GS/` folder and writes Go files in the `GO/` folder,
 creating the output folders if needed and watching the Generis files for modifications.
 
 ```bash
-generis --process GS/ GO/ --trim --join --create --watch --go
+generis --process GS/ GO/ --trim --join --create --watch
 ```
 
 Reads the Generis files in the `GS/` folder and writes Go files in the `GO/` folder,
@@ -401,7 +397,7 @@ and watching the Generis files for modifications.
 
 ## Version
 
-1.0
+2.0
 
 ## Author
 

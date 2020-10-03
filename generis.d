@@ -1996,10 +1996,7 @@ class FILE
 // -- VARIABLES
 
 bool
-    CsOptionIsEnabled,
     CreateOptionIsEnabled,
-    GoOptionIsEnabled,
-    JsOptionIsEnabled,
     JoinOptionIsEnabled,
     TrimOptionIsEnabled,
     WatchOptionIsEnabled;
@@ -2012,6 +2009,7 @@ string
     ElsePrefix,
     EndCommand,
     EndPrefix,
+    Extension,
     IfCommand,
     IfPrefix,
     Prefix,
@@ -2999,24 +2997,10 @@ void FindInputFiles(
                     }
                     else
                     {
-                        output_file_path = output_folder_path ~ input_file_path[ input_folder_path.length .. $ - 3 ];
-
-                        if ( GoOptionIsEnabled )
-                        {
-                            output_file_path ~= ".go";
-                        }
-                        else if ( CsOptionIsEnabled )
-                        {
-                            output_file_path ~= ".cs";
-                        }
-                        else if ( JsOptionIsEnabled )
-                        {
-                            output_file_path ~= ".js";
-                        }
-                        else
-                        {
-                            Abort( "Missing output option" );
-                        }
+                        output_file_path
+                            = output_folder_path
+                              ~ input_file_path[ input_folder_path.length .. $ - 3 ]
+                              ~ Extension;
                     }
 
                     found_file = input_file_path in FileMap;
@@ -3171,9 +3155,7 @@ void main(
     WatchOptionIsEnabled = false;
     PauseDuration = 500;
     TabulationSpaceCount = 4;
-    GoOptionIsEnabled = false;
-    CsOptionIsEnabled = false;
-    JsOptionIsEnabled = false;
+    Extension = ".go";
 
     while ( argument_array.length >= 1
             && argument_array[ 0 ].startsWith( "--" ) )
@@ -3238,23 +3220,13 @@ void main(
 
             argument_array = argument_array[ 1 .. $ ];
         }
-        else if ( option == "--go"
-                  && !CsOptionIsEnabled
-                  && !JsOptionIsEnabled )
+        else if ( option == "extension"
+                  && argument_array.length >= 1
+                  && argument_array[ 0 ].startsWith( '.' ) )
         {
-            GoOptionIsEnabled = true;
-        }
-        else if ( option == "--cs"
-                  && !GoOptionIsEnabled
-                  && !JsOptionIsEnabled )
-        {
-            CsOptionIsEnabled = true;
-        }
-        else if ( option == "--js"
-                  && !GoOptionIsEnabled
-                  && !CsOptionIsEnabled )
-        {
-            JsOptionIsEnabled = true;
+            Extension = argument_array[ 0 ];
+
+            argument_array = argument_array[ 1 .. $ ];
         }
         else
         {
@@ -3265,9 +3237,7 @@ void main(
     BuildCommands();
 
     if ( argument_array.length == 0
-         && ( GoOptionIsEnabled
-              || CsOptionIsEnabled
-              || JsOptionIsEnabled ) )
+         && Extension != "" )
     {
         if ( WatchOptionIsEnabled )
         {
@@ -3292,24 +3262,13 @@ void main(
         writeln( "    --watch" );
         writeln( "    --pause 500" );
         writeln( "    --tabulation 4" );
-        writeln( "    --go" );
-        writeln( "    --cs" );
-        writeln( "    --js" );
+        writeln( "    --extension .go" );
         writeln( "Examples :" );
-        writeln( "    generis --process GS/ GO/ --go" );
-        writeln( "    generis --process GS/ GO/ --create --go" );
-        writeln( "    generis --process GS/ GO/ --create --watch --go" );
-        writeln( "    generis --process GS/ GO/ --trim --join --create --watch --go" );
+        writeln( "    generis --process GS/ GO/" );
+        writeln( "    generis --process GS/ GO/ --create" );
+        writeln( "    generis --process GS/ GO/ --create --watch" );
+        writeln( "    generis --process GS/ GO/ --trim --join --create --watch" );
 
-        if ( !GoOptionIsEnabled
-             && !CsOptionIsEnabled
-             && !JsOptionIsEnabled )
-        {
-            PrintError( "Missing output language option" );
-        }
-        else
-        {
-            PrintError( "Invalid arguments : " ~ argument_array.to!string() );
-        }
+        PrintError( "Invalid arguments : " ~ argument_array.to!string() );
     }
 }
