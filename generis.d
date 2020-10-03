@@ -1278,8 +1278,8 @@ class FILE
             line = LineArray[ line_index ].stripRight();
             stripped_line = line.stripLeft();
 
-            if ( stripped_line == "#define"
-                 || stripped_line.startsWith( "#define " ) )
+            if ( stripped_line == DefineCommand
+                 || stripped_line.startsWith( DefinePrefix ) )
             {
                 command_space_count = GetSpaceCount( line );
 
@@ -1287,9 +1287,9 @@ class FILE
 
                 definition = new DEFINITION();
 
-                if ( stripped_line.startsWith( "#define " ) )
+                if ( stripped_line.startsWith( DefinePrefix ) )
                 {
-                    definition.OldLineArray ~= stripped_line[ 8 .. $ ].strip();
+                    definition.OldLineArray ~= stripped_line[ DefinePrefix.length .. $ ].strip();
                 }
 
                 while ( line_index < LineArray.length )
@@ -1297,8 +1297,8 @@ class FILE
                     line = LineArray[ line_index ].stripRight();
                     stripped_line = line.stripLeft();
 
-                    if ( stripped_line == "#as"
-                         || stripped_line.startsWith( "#as " ) )
+                    if ( stripped_line == AsCommand
+                         || stripped_line.startsWith( AsPrefix ) )
                     {
                         break;
                     }
@@ -1314,15 +1314,15 @@ class FILE
                 {
                     Dump( LineArray );
 
-                    AbortFile( "Missing #as for #define" );
+                    AbortFile( "Missing " ~ AsCommand ~" for " ~ DefineCommand );
                 }
 
                 ++line_index;
 
 
-                if ( stripped_line.startsWith( "#as " ) )
+                if ( stripped_line.startsWith( AsPrefix ) )
                 {
-                    definition.NewLineArray ~= stripped_line[ 4 .. $ ].strip();
+                    definition.NewLineArray ~= stripped_line[ AsPrefix.length .. $ ].strip();
                 }
                 else
                 {
@@ -1340,7 +1340,7 @@ class FILE
                             ++level;
                         }
 
-                        if ( stripped_line == "#end"
+                        if ( stripped_line == EndCommand
                              && level == 0 )
                         {
                             break;
@@ -1349,7 +1349,7 @@ class FILE
                         {
                             definition.NewLineArray ~= line.RemoveSpaceCount( command_space_count + TabulationSpaceCount );
 
-                            if ( stripped_line == "#end" )
+                            if ( stripped_line == EndCommand )
                             {
                                 --level;
 
@@ -1357,7 +1357,7 @@ class FILE
                                 {
                                     Dump( LineArray[ 0 .. line_index + 1 ] );
 
-                                    AbortFile( "Invalid #end" );
+                                    AbortFile( "Invalid " ~ EndCommand );
                                 }
                             }
                         }
@@ -1369,7 +1369,7 @@ class FILE
                     {
                         Dump( LineArray );
 
-                        AbortFile( "Missing #end for #define" );
+                        AbortFile( "Missing " ~ EndCommand ~ " for " ~ DefineCommand );
                     }
                 }
 
@@ -1426,9 +1426,9 @@ class FILE
             line = LineArray[ line_index ].stripRight();
             stripped_line = line.stripLeft();
 
-            if ( stripped_line.startsWith( "#if " ) )
+            if ( stripped_line.startsWith( IfPrefix ) )
             {
-                condition = stripped_line[ 4 .. $ ].EvaluateBooleanExpression();
+                condition = stripped_line[ IfPrefix.length .. $ ].EvaluateBooleanExpression();
                 level = 0;
 
                 end_line_index = line_index + 1;
@@ -1445,14 +1445,14 @@ class FILE
                         ++level;
                     }
 
-                    if ( stripped_line == "#end"
+                    if ( stripped_line == EndCommand
                          && level == 0 )
                     {
                         break;
                     }
                     else
                     {
-                        if ( stripped_line == "#else"
+                        if ( stripped_line == ElseCommand
                              && level == 0 )
                         {
                             condition = !condition;
@@ -1462,7 +1462,7 @@ class FILE
                             condition_line_array ~= line.RemoveSpaceCount( TabulationSpaceCount );
                         }
 
-                        if ( stripped_line == "#end" )
+                        if ( stripped_line == EndCommand )
                         {
                             --level;
 
@@ -1470,7 +1470,7 @@ class FILE
                             {
                                 Dump( LineArray[ 0 .. end_line_index + 1 ] );
 
-                                AbortFile( "Invalid #end" );
+                                AbortFile( "Invalid " ~ EndCommand );
                             }
                         }
                     }
@@ -1482,7 +1482,7 @@ class FILE
                 {
                     Dump( LineArray );
 
-                    AbortFile( "Missing #end for #if" );
+                    AbortFile( "Missing " ~ EndCommand ~ " for " ~ IfCommand );
                 }
 
                 LineArray
@@ -1732,9 +1732,9 @@ class FILE
             line = LineArray[ line_index ].stripRight();
             stripped_line = line.stripLeft();
 
-            if ( stripped_line.startsWith( "#write " ) )
+            if ( stripped_line.startsWith( WritePrefix ) )
             {
-                writer_expression = stripped_line[ 7 .. $ ].strip();
+                writer_expression = stripped_line[ WritePrefix.length .. $ ].strip();
 
                 if ( writer_expression == "" )
                 {
@@ -1754,7 +1754,7 @@ class FILE
                     line = LineArray[ line_index ].stripRight().RemoveSpaceCount( space_count + TabulationSpaceCount );
                     stripped_line = line.stripLeft();
 
-                    if ( stripped_line == "#end" )
+                    if ( stripped_line == EndCommand )
                     {
                         break;
                     }
@@ -1770,7 +1770,7 @@ class FILE
                 {
                     Dump( LineArray );
 
-                    AbortFile( "Missing #end for #write" );
+                    AbortFile( "Missing " ~ EndCommand ~ " for " ~ WriteCommand );
                 }
 
                 template_text = GetTemplateText( template_line_array, writer_expression, space_count );
@@ -1980,7 +1980,11 @@ class FILE
 
         try
         {
-            OutputPath.write( output_text );
+            if ( !OutputPath.exists()
+                 || OutputPath.readText() != output_text )
+            {
+                OutputPath.write( output_text );
+            }
         }
         catch ( FileException file_exception )
         {
@@ -2000,7 +2004,20 @@ bool
     TrimOptionIsEnabled,
     WatchOptionIsEnabled;
 string
-    SpaceText;
+    AsCommand,
+    AsPrefix,
+    DefineCommand,
+    DefinePrefix,
+    ElseCommand,
+    ElsePrefix,
+    EndCommand,
+    EndPrefix,
+    IfCommand,
+    IfPrefix,
+    Prefix,
+    SpaceText,
+    WriteCommand,
+    WritePrefix;
 string[]
     InputFolderPathArray,
     OutputFolderPathArray;
@@ -2352,8 +2369,8 @@ bool IsOpeningCommand(
     )
 {
     return
-        stripped_line == "#as"
-        || stripped_line.startsWith( "#if " );
+        stripped_line == AsCommand
+        || stripped_line.startsWith( IfPrefix );
 }
 
 // ~~
@@ -3114,6 +3131,25 @@ void WatchFiles(
 
 // ~~
 
+void BuildCommands(
+    )
+{
+    AsCommand = Prefix ~ "as";
+    AsPrefix = Prefix ~ "as ";
+    DefineCommand = Prefix ~ "define";
+    DefinePrefix = Prefix ~ "define ";
+    ElseCommand = Prefix ~ "else";
+    ElsePrefix = Prefix ~ "else ";
+    EndCommand = Prefix ~ "end";
+    EndPrefix = Prefix ~ "end ";
+    IfCommand = Prefix ~ "if";
+    IfPrefix = Prefix ~ "if ";
+    WriteCommand = Prefix ~ "write";
+    WritePrefix = Prefix ~ "write ";
+}
+
+// ~~
+
 void main(
     string[] argument_array
     )
@@ -3126,7 +3162,7 @@ void main(
     argument_array = argument_array[ 1 .. $ ];
 
     SpaceText = " ";
-
+    Prefix = "#";
     InputFolderPathArray = null;
     OutputFolderPathArray = null;
     TrimOptionIsEnabled = false;
@@ -3146,9 +3182,16 @@ void main(
 
         argument_array = argument_array[ 1 .. $ ];
 
-        if ( option == "--parse"
-             && argument_array.length >= 1
-             && argument_array[ 0 ].GetLogicalPath().endsWith( '/' ) )
+        if ( option == "--prefix"
+             && argument_array.length >= 1 )
+        {
+            Prefix = argument_array[ 0 ];
+
+            argument_array = argument_array[ 1 .. $ ];
+        }
+        else if ( option == "--parse"
+                  && argument_array.length >= 1
+                  && argument_array[ 0 ].GetLogicalPath().endsWith( '/' ) )
         {
             InputFolderPathArray ~= argument_array[ 0 ].GetLogicalPath();
             OutputFolderPathArray ~= "";
@@ -3219,6 +3262,8 @@ void main(
         }
     }
 
+    BuildCommands();
+
     if ( argument_array.length == 0
          && ( GoOptionIsEnabled
               || CsOptionIsEnabled
@@ -3238,6 +3283,7 @@ void main(
         writeln( "Usage :" );
         writeln( "    generis [options]" );
         writeln( "Options :" );
+        writeln( "    --prefix #" );
         writeln( "    --parse INPUT_FOLDER/" );
         writeln( "    --process INPUT_FOLDER/ OUTPUT_FOLDER/" );
         writeln( "    --trim" );

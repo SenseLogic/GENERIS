@@ -353,6 +353,7 @@ generis [options]
 ### Options
 
 ```
+--prefix # : set the command prefix
 --parse INPUT_FOLDER/ : parse the definitions of the Generis files in the input folder
 --process INPUT_FOLDER/ OUTPUT_FOLDER/ : reads the Generis files in the input folder and writes the processed files in the output folder
 --trim : trim the HTML templates
