@@ -24,7 +24,7 @@ import core.stdc.stdlib : exit;
 import core.thread;
 import std.conv : to;
 import std.datetime : Clock, SysTime;
-import std.file : dirEntries, exists, mkdirRecurse, readText, timeLastModified, write, FileException, SpanMode;
+import std.file : dirEntries, exists, mkdirRecurse, readText, timeLastModified, write, SpanMode;
 import std.path : dirName;
 import std.stdio : writeln;
 import std.string : endsWith, indexOf, join, replace, split, startsWith, strip, stripLeft, stripRight, toLower, toUpper;
@@ -1232,9 +1232,9 @@ class FILE
             {
                 Text = InputPath.readText();
             }
-            catch ( FileException file_exception )
+            catch ( Exception exception )
             {
-                Abort( "Can't read file : " ~ InputPath, file_exception );
+                Abort( "Can't read file : " ~ InputPath, exception );
             }
 
             UsesCarriageReturn = ( Text.indexOf( '\r' ) >= 0 );
@@ -1947,9 +1947,9 @@ class FILE
                     output_folder_path.mkdirRecurse();
                 }
             }
-            catch ( FileException file_exception )
+            catch ( Exception exception )
             {
-                Abort( "Can't create folder : " ~ output_folder_path, file_exception );
+                Abort( "Can't create folder : " ~ output_folder_path, exception );
             }
         }
     }
@@ -1986,9 +1986,9 @@ class FILE
                 OutputPath.write( output_text );
             }
         }
-        catch ( FileException file_exception )
+        catch ( Exception exception )
         {
-            Abort( "Can't write file : " ~ OutputPath, file_exception );
+            Abort( "Can't write file : " ~ OutputPath, exception );
         }
     }
 }
@@ -2051,11 +2051,11 @@ void Abort(
 
 void Abort(
     string message,
-    FileException file_exception
+    Exception exception
     )
 {
     PrintError( message );
-    PrintError( file_exception.msg );
+    PrintError( exception.msg );
 
     exit( -1 );
 }
@@ -2283,7 +2283,7 @@ string GetLogicalPath(
     string path
     )
 {
-    return path.replace( "\\", "/" );
+    return path.replace( '\\', '/' );
 }
 
 // ~~
