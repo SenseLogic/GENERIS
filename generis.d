@@ -2121,6 +2121,7 @@ string GetSnakeCaseText(
 {
     char
         character,
+        next_character,
         prior_character;
     string
         snake_case_text;
@@ -2133,12 +2134,24 @@ string GetSnakeCaseText(
         prior_character = character;
         character = text[ character_index ];
 
+        if ( character_index + 1 < text.length )
+        {
+            next_character = text[ character_index + 1];
+        }
+        else
+        {
+            next_character = 0;
+        }
+
         if ( ( ( prior_character >= 'a' && prior_character <= 'z' )
                && ( ( character >= 'A' && character <= 'Z' )
                     || ( character >= '0' && character <= '9' ) ) )
              || ( ( prior_character >= '0' && prior_character <= '9' )
                   && ( ( character >= 'a' && character <= 'z' )
-                       || ( character >= 'A' && character <= 'Z' ) ) ) )
+                       || ( character >= 'A' && character <= 'Z' ) ) )
+             || ( ( prior_character >= 'A' && prior_character <= 'Z' )
+                  && ( character >= 'A' && character <= 'Z' )
+                  && ( next_character >= 'a' && next_character <= 'z' ) ) )
         {
             snake_case_text ~= '_';
         }
