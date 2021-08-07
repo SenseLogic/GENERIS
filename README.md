@@ -270,13 +270,15 @@ RemoveComments
 RemoveBlanks
 PackStrings
 PackIdentifiers
-ReplaceText old_text new_text
 ReplacePrefix old_prefix new_prefix
 ReplaceSuffix old_suffix new_suffix
+ReplaceText old_text new_text
 ReplaceIdentifier old_identifier new_identifier
-RemoveText text
+AddPrefix prefix
+AddSuffix suffix
 RemovePrefix prefix
 RemoveSuffix suffix
+RemoveText text
 RemoveIdentifier identifier
 ```
 

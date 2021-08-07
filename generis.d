@@ -883,16 +883,6 @@ class DEFINITION
             {
                 new_token_array.RemoveComments();
             }
-            else if ( function_name == "ReplaceText"
-                      && argument_count == 2
-                      && parameter_token_array[ 0 ].IsString()
-                      && parameter_token_array[ 1 ].IsString() )
-            {
-                new_token_array.ReplaceText(
-                    parameter_token_array[ 0 ].Text,
-                    parameter_token_array[ 1 ].Text
-                    );
-            }
             else if ( function_name == "ReplacePrefix"
                       && argument_count == 2
                       && parameter_token_array[ 0 ].IsString()
@@ -913,6 +903,16 @@ class DEFINITION
                     parameter_token_array[ 1 ].Text
                     );
             }
+            else if ( function_name == "ReplaceText"
+                      && argument_count == 2
+                      && parameter_token_array[ 0 ].IsString()
+                      && parameter_token_array[ 1 ].IsString() )
+            {
+                new_token_array.ReplaceText(
+                    parameter_token_array[ 0 ].Text,
+                    parameter_token_array[ 1 ].Text
+                    );
+            }
             else if ( function_name == "ReplaceIdentifier"
                       && argument_count == 2
                       && parameter_token_array[ 0 ].IsString()
@@ -923,11 +923,19 @@ class DEFINITION
                     parameter_token_array[ 1 ].Text
                     );
             }
-            else if ( function_name == "RemoveText"
+            else if ( function_name == "AddPrefix"
                       && argument_count == 1
                       && parameter_token_array[ 0 ].IsString() )
             {
-                new_token_array.RemoveText(
+                new_token_array.AddPrefix(
+                    parameter_token_array[ 0 ].Text
+                    );
+            }
+            else if ( function_name == "AddSuffix"
+                      && argument_count == 1
+                      && parameter_token_array[ 0 ].IsString() )
+            {
+                new_token_array.AddSuffix(
                     parameter_token_array[ 0 ].Text
                     );
             }
@@ -944,6 +952,14 @@ class DEFINITION
                       && parameter_token_array[ 0 ].IsString() )
             {
                 new_token_array.RemoveSuffix(
+                    parameter_token_array[ 0 ].Text
+                    );
+            }
+            else if ( function_name == "RemoveText"
+                      && argument_count == 1
+                      && parameter_token_array[ 0 ].IsString() )
+            {
+                new_token_array.RemoveText(
                     parameter_token_array[ 0 ].Text
                     );
             }
@@ -2231,6 +2247,52 @@ void ReplaceText(
 
 // ~~
 
+void AddPrefix(
+    ref string text,
+    string prefix
+    )
+{
+    text = prefix ~ text;
+}
+
+// ~~
+
+void AddSuffix(
+    ref string text,
+    string suffix
+    )
+{
+    text = text ~ suffix;
+}
+
+// ~~
+
+void RemovePrefix(
+    ref string text,
+    string prefix
+    )
+{
+    if ( text.startsWith( prefix ) )
+    {
+        text = text[ prefix.length .. $ ];
+    }
+}
+
+// ~~
+
+void RemoveSuffix(
+    ref string text,
+    string suffix
+    )
+{
+    if ( text.endsWith( suffix ) )
+    {
+        text = text[ 0 .. $ - suffix.length ];
+    }
+}
+
+// ~~
+
 long GetSpaceCount(
     string text
     )
@@ -2787,6 +2849,34 @@ void ReplaceIdentifier(
 
 // ~~
 
+void AddPrefix(
+    ref TOKEN[] token_array,
+    string prefix
+    )
+{
+    if ( token_array.length > 0
+         && token_array[ 0 ].IsIdentifier() )
+    {
+        AddPrefix( token_array[ 0 ].Text, prefix );
+    }
+}
+
+// ~~
+
+void AddSuffix(
+    ref TOKEN[] token_array,
+    string suffix
+    )
+{
+    if ( token_array.length > 0
+         && token_array[ 0 ].IsIdentifier() )
+    {
+        AddSuffix( token_array[ 0 ].Text, suffix );
+    }
+}
+
+// ~~
+
 void RemovePrefix(
     ref TOKEN[] token_array,
     string prefix
@@ -2795,7 +2885,7 @@ void RemovePrefix(
     if ( token_array.length > 0
          && token_array[ 0 ].IsIdentifier() )
     {
-        ReplacePrefix( token_array[ 0 ].Text, prefix, "" );
+        RemovePrefix( token_array[ 0 ].Text, prefix );
     }
 }
 
@@ -2809,7 +2899,7 @@ void RemoveSuffix(
     if ( token_array.length > 0
          && token_array[ 0 ].IsIdentifier() )
     {
-        ReplaceSuffix( token_array[ 0 ].Text, suffix, "" );
+        RemoveSuffix( token_array[ 0 ].Text, suffix );
     }
 }
 
